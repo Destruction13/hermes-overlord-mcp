@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn, spawnSync } from "node:child_process";
+import fs from "node:fs";
 import { createServer } from "node:http";
 import os from "node:os";
 import path from "node:path";
@@ -14,12 +15,30 @@ import { z } from "zod";
 
 const PACKAGE_ROOT = path.resolve(path.join(path.dirname(fileURLToPath(import.meta.url)), ".."));
 const NPM_PACKAGE_NAME = "@destruction13/hermes-overlord-mcp";
-const PACKAGE_NAME = process.env.HERMES_MCP_PACKAGE_NAME || process.env.npm_config_package || NPM_PACKAGE_NAME;
 const SERVER_ID = "hermes-overlord";
 const DISPLAY_NAME = "Hermes Overlord";
 const VERSION = "1.0.0";
 
 const ROOT = PACKAGE_ROOT;
+
+function packageRefFromNpxLock() {
+  const lockPath = path.join(PACKAGE_ROOT, "..", "..", ".package-lock.json");
+  if (!fs.existsSync(lockPath)) return null;
+  try {
+    const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+    const entry = lock.packages?.[`node_modules/${NPM_PACKAGE_NAME}`];
+    const resolved = entry?.resolved;
+    if (typeof resolved !== "string") return null;
+    const match = resolved.match(/^git\+(?:ssh:\/\/git@|https:\/\/)github\.com[/:]([^/]+)\/([^#]+?)(?:\.git)?(?:#(.+))?$/i);
+    if (!match) return null;
+    const [, owner, repo, ref] = match;
+    return `github:${owner}/${repo}${ref ? `#${ref}` : ""}`;
+  } catch {
+    return null;
+  }
+}
+
+const PACKAGE_NAME = process.env.HERMES_MCP_PACKAGE_NAME || process.env.npm_config_package || packageRefFromNpxLock() || NPM_PACKAGE_NAME;
 
 function defaultHermesHome() {
   if (process.env.HERMES_HOME) return process.env.HERMES_HOME;

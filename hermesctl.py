@@ -288,7 +288,29 @@ def default_package_name() -> str:
     npx_package = os.environ.get("npm_config_package")
     if npx_package:
         return npx_package
+    lock_ref = package_ref_from_npx_lock()
+    if lock_ref:
+        return lock_ref
     return NPM_PACKAGE_NAME
+
+
+def package_ref_from_npx_lock(root: Path = ROOT) -> str | None:
+    lock_path = root.parent.parent / ".package-lock.json"
+    if not lock_path.exists():
+        return None
+    try:
+        lock = json.loads(read_text(lock_path))
+    except Exception:
+        return None
+    entry = (lock.get("packages") or {}).get(f"node_modules/{NPM_PACKAGE_NAME}")
+    resolved = entry.get("resolved") if isinstance(entry, dict) else None
+    if not isinstance(resolved, str):
+        return None
+    match = re.match(r"^git\+(?:ssh://git@|https://)github\.com[/:]([^/]+)/([^#]+?)(?:\.git)?(?:#(.+))?$", resolved, re.IGNORECASE)
+    if not match:
+        return None
+    owner, repo, ref = match.groups()
+    return f"github:{owner}/{repo}{'#' + ref if ref else ''}"
 
 
 def default_workspace() -> str:

@@ -58,6 +58,29 @@ class HermesCtlTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {"npm_config_package": "github:Destruction13/hermes-overlord-mcp"}, clear=False):
             self.assertEqual(hermesctl.default_package_name(), "github:Destruction13/hermes-overlord-mcp")
 
+    def test_package_ref_from_npx_lock_detects_git_source(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "node_modules" / "@destruction13" / "hermes-overlord-mcp"
+            root.mkdir(parents=True)
+            lock = root.parent.parent / ".package-lock.json"
+            lock.write_text(
+                json.dumps(
+                    {
+                        "packages": {
+                            "node_modules/@destruction13/hermes-overlord-mcp": {
+                                "resolved": "git+ssh://git@github.com/Destruction13/hermes-overlord-mcp.git#abc123"
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            self.assertEqual(
+                hermesctl.package_ref_from_npx_lock(root),
+                "github:Destruction13/hermes-overlord-mcp#abc123",
+            )
+
     def test_init_install_writes_home_templates_and_config(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             temp_path = Path(temp)
