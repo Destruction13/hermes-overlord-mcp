@@ -309,8 +309,8 @@ def package_ref_from_npx_lock(root: Path = ROOT) -> str | None:
     match = re.match(r"^git\+(?:ssh://git@|https://)github\.com[/:]([^/]+)/([^#]+?)(?:\.git)?(?:#(.+))?$", resolved, re.IGNORECASE)
     if not match:
         return None
-    owner, repo, ref = match.groups()
-    return f"github:{owner}/{repo}{'#' + ref if ref else ''}"
+    owner, repo, _ref = match.groups()
+    return f"github:{owner}/{repo}"
 
 
 def default_workspace() -> str:

@@ -31,8 +31,8 @@ function packageRefFromNpxLock() {
     if (typeof resolved !== "string") return null;
     const match = resolved.match(/^git\+(?:ssh:\/\/git@|https:\/\/)github\.com[/:]([^/]+)\/([^#]+?)(?:\.git)?(?:#(.+))?$/i);
     if (!match) return null;
-    const [, owner, repo, ref] = match;
-    return `github:${owner}/${repo}${ref ? `#${ref}` : ""}`;
+    const [, owner, repo] = match;
+    return `github:${owner}/${repo}`;
   } catch {
     return null;
   }

@@ -78,7 +78,7 @@ class HermesCtlTests(unittest.TestCase):
 
             self.assertEqual(
                 hermesctl.package_ref_from_npx_lock(root),
-                "github:Destruction13/hermes-overlord-mcp#abc123",
+                "github:Destruction13/hermes-overlord-mcp",
             )
 
     def test_init_install_writes_home_templates_and_config(self) -> None:
