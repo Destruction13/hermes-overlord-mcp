@@ -59,137 +59,55 @@ Client-specific presets below only adapt where each app stores this same server.
 }
 ```
 
-## Клиентские предустановки
+## Client presets
 
-Откройте блок для своей интегрированной среды разработки или клиентского
-агента. Сервер MCP универсален, небольшая оболочка меняет только конфигурацию,
-которую ожидает каждый клиент.
+Pick your IDE or agent client from the horizontal preset bar. Hermes stays the
+same MCP server; the client preset only changes the generated config shape.
 
-<details>
-<summary><strong>Claude Code</strong></summary>
+<p align="left">
+  <a href="#client-command"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Codex" src="https://img.shields.io/badge/Codex-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="VS Code" src="https://img.shields.io/badge/VS%20Code%20%2F%20Copilot-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Windsurf" src="https://img.shields.io/badge/Windsurf-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Gemini CLI" src="https://img.shields.io/badge/Gemini%20CLI-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Kilo Code" src="https://img.shields.io/badge/Kilo%20Code-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Kiro" src="https://img.shields.io/badge/Kiro-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Antigravity" src="https://img.shields.io/badge/Antigravity-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Cline" src="https://img.shields.io/badge/Cline-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Roo Code" src="https://img.shields.io/badge/Roo%20Code-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Continue" src="https://img.shields.io/badge/Continue-111827?style=for-the-badge"></a>
+  <a href="#client-command"><img alt="Zed" src="https://img.shields.io/badge/Zed-111827?style=for-the-badge"></a>
+</p>
 
-```bash
-claude mcp add hermes-overlord --scope local -e HERMES_BRIDGE_CLIENT=claude-code -- npx -y github:Destruction13/hermes-overlord-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>Codex</strong></summary>
-
-```bash
-codex mcp add hermes-overlord --env HERMES_BRIDGE_CLIENT=codex -- npx -y github:Destruction13/hermes-overlord-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>VS Code / GitHub Copilot</strong></summary>
+<a id="client-command"></a>
 
 ```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client vscode --format add-mcp
+npx -y github:Destruction13/hermes-overlord-mcp install --client <client-id>
+npx -y github:Destruction13/hermes-overlord-mcp config --client <client-id>
 ```
 
-</details>
-
-<details>
-<summary><strong>Курсор</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client cursor --format add-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>Виндсерфинг</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
-```
-
-</details>
-
-<details>
-<summary><strong>OpenCode</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
-```
-
-</details>
-
-<details>
-<summary><strong>Gemini CLI</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
-```
-
-</details>
-
-<details>
-<summary><strong>Kilo Code</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
-```
-
-</details>
-
-<details>
-<summary><strong>Kiro</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>Антигравитация</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity --format add-mcp
-```
-
-</details>
-
-<details>
-<summary><strong>Cline</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client cline
-```
-
-</details>
-
-<details>
-<summary><strong>Roo Code</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
-```
-
-</details>
-
-<details>
-<summary><strong>Продолжить</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client continue
-```
-
-</details>
-
-<details>
-<summary><strong>Zed</strong></summary>
-
-```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client zed
-```
-
-</details>
+<table>
+  <tr>
+    <td><strong>Claude Code</strong><br><code>claude-code</code></td>
+    <td><strong>Codex</strong><br><code>codex</code></td>
+    <td><strong>VS Code / Copilot</strong><br><code>vscode</code></td>
+    <td><strong>Cursor</strong><br><code>cursor</code></td>
+    <td><strong>Windsurf</strong><br><code>windsurf</code></td>
+    <td><strong>OpenCode</strong><br><code>opencode</code></td>
+    <td><strong>Gemini CLI</strong><br><code>gemini-cli</code></td>
+  </tr>
+  <tr>
+    <td><strong>Kilo Code</strong><br><code>kilo</code></td>
+    <td><strong>Kiro</strong><br><code>kiro</code></td>
+    <td><strong>Antigravity</strong><br><code>antigravity</code></td>
+    <td><strong>Cline</strong><br><code>cline</code></td>
+    <td><strong>Roo Code</strong><br><code>roo-code</code></td>
+    <td><strong>Continue</strong><br><code>continue</code></td>
+    <td><strong>Zed</strong><br><code>zed</code></td>
+  </tr>
+</table>
 
 ## Tool surface
 
