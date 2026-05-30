@@ -1,8 +1,9 @@
 {
-  "mcp": {
-    "servers": {
-      "hermes-overlord": {
-        "command": "npx",
+  "context_servers": {
+    "hermes-overlord": {
+      "source": "custom",
+      "command": {
+        "path": "npx",
         "args": [
           "-y",
           "github:Destruction13/hermes-overlord-mcp"
@@ -12,7 +13,7 @@
           "HERMES_BRIDGE_PROFILE": "overlord",
           "HERMES_BRIDGE_BOARD": "overlord",
           "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",
-          "HERMES_BRIDGE_CLIENT": "cursor"
+          "HERMES_BRIDGE_CLIENT": "zed"
         }
       }
     }

@@ -1,14 +1,17 @@
 {
   "mcpServers": {
     "hermes-overlord": {
-      "serverUrl": "http://127.0.0.1:8765/mcp",
-      "url": "http://127.0.0.1:8765/mcp",
+      "command": "npx",
+      "args": [
+        "-y",
+        "github:Destruction13/hermes-overlord-mcp"
+      ],
       "env": {
         "HERMES_HOME": "${HERMES_HOME}",
         "HERMES_BRIDGE_PROFILE": "overlord",
         "HERMES_BRIDGE_BOARD": "overlord",
         "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",
-        "HERMES_BRIDGE_CLIENT": "codex"
+        "HERMES_BRIDGE_CLIENT": "claude-code"
       }
     }
   }

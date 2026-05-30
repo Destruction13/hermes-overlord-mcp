@@ -17,7 +17,7 @@ const PACKAGE_ROOT = path.resolve(path.join(path.dirname(fileURLToPath(import.me
 const NPM_PACKAGE_NAME = "@destruction13/hermes-overlord-mcp";
 const SERVER_ID = "hermes-overlord";
 const DISPLAY_NAME = "Hermes Overlord";
-const VERSION = "1.0.0";
+const VERSION = "1.1.0";
 
 const ROOT = PACKAGE_ROOT;
 
@@ -359,7 +359,7 @@ function valueAfter(argv, flag) {
 }
 
 function printHelp() {
-  console.log(`Hermes Overlord MCP\n\nUsage:\n  hermes-overlord-mcp                 Start MCP over stdio\n  hermes-overlord-mcp mcp             Start MCP over stdio\n  hermes-overlord-mcp start-http      Start MCP over Streamable HTTP\n  hermes-overlord-mcp init            Initialize HERMES_HOME and write a config snippet\n  hermes-overlord-mcp config          Print an MCP config snippet\n  hermes-overlord-mcp doctor          Check local readiness\n  hermes-overlord-mcp package         Build dist/hermes-portable\n  hermes-overlord-mcp clean-audit     Audit/quarantine local artifacts\n\nExamples:\n  npx -y ${PACKAGE_NAME} init --client generic\n  npx -y ${PACKAGE_NAME} config --client vscode\n  npx -y ${PACKAGE_NAME} config --client kiro --format add-mcp\n  npx -y ${PACKAGE_NAME} doctor`);
+  console.log(`Hermes Overlord MCP\n\nUsage:\n  hermes-overlord-mcp                 Start MCP over stdio\n  hermes-overlord-mcp mcp             Start MCP over stdio\n  hermes-overlord-mcp start-http      Start MCP over Streamable HTTP\n  hermes-overlord-mcp init            Initialize HERMES_HOME and write a config snippet\n  hermes-overlord-mcp install         Print install guide/snippets for MCP clients\n  hermes-overlord-mcp config          Print an MCP config snippet\n  hermes-overlord-mcp doctor          Check local readiness\n  hermes-overlord-mcp package         Build dist/hermes-portable\n  hermes-overlord-mcp clean-audit     Audit/quarantine local artifacts\n\nExamples:\n  npx -y ${PACKAGE_NAME} install\n  npx -y ${PACKAGE_NAME} install --client claude-code\n  npx -y ${PACKAGE_NAME} init --client generic\n  npx -y ${PACKAGE_NAME} config --client vscode\n  npx -y ${PACKAGE_NAME} config --client kiro --format add-mcp\n  npx -y ${PACKAGE_NAME} doctor`);
 }
 
 function runHermesCtl(args) {
@@ -387,6 +387,7 @@ async function main() {
   if (command === "clean-audit") return runHermesCtl(["clean-audit", ...argv.slice(1)]);
   if (command === "config" || command === "mcp-config") return runHermesCtl(["mcp-config", "--package-name", PACKAGE_NAME, ...argv.slice(1)]);
   if (command === "init") return runHermesCtl(["init", "--package-name", PACKAGE_NAME, ...argv.slice(1)]);
+  if (command === "install") return runHermesCtl(["install", "--package-name", PACKAGE_NAME, ...argv.slice(1)]);
   console.error(`Unknown command: ${command}`);
   printHelp();
   process.exit(2);

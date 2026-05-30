@@ -6,19 +6,25 @@ agent client needs because clients store MCP settings in different files.
 
 ## Quick start
 
-Use GitHub before npm publication:
+Use the public GitHub package before npm publication:
 
 ```bash
+npx -y github:Destruction13/hermes-overlord-mcp install
 npx -y github:Destruction13/hermes-overlord-mcp init --client generic
 npx -y github:Destruction13/hermes-overlord-mcp doctor
 ```
 
-The GitHub form requires repository access until the repository is public or the
-package is published to npm.
+The `install` command prints the same kind of setup surface many MCP products
+show in their docs: a standard JSON block, requirements, and per-client setup
+blocks.
+
+For a static copy of that install surface, see
+[`INSTALL.md`](./INSTALL.md).
 
 Use npm after publication:
 
 ```bash
+npx -y @destruction13/hermes-overlord-mcp install
 npx -y @destruction13/hermes-overlord-mcp init --client generic
 npx -y @destruction13/hermes-overlord-mcp doctor
 ```
@@ -26,20 +32,26 @@ npx -y @destruction13/hermes-overlord-mcp doctor
 Generate snippets for specific clients when you know the target IDE:
 
 ```bash
-npx -y @destruction13/hermes-overlord-mcp config --client vscode
-npx -y @destruction13/hermes-overlord-mcp config --client cursor
-npx -y @destruction13/hermes-overlord-mcp config --client kilo
-npx -y @destruction13/hermes-overlord-mcp config --client kiro
-npx -y @destruction13/hermes-overlord-mcp config --client windsurf
-npx -y @destruction13/hermes-overlord-mcp config --client opencode
-npx -y @destruction13/hermes-overlord-mcp config --client codex
-npx -y @destruction13/hermes-overlord-mcp config --client antigravity
+npx -y github:Destruction13/hermes-overlord-mcp config --client generic
+npx -y github:Destruction13/hermes-overlord-mcp config --client claude-code
+npx -y github:Destruction13/hermes-overlord-mcp config --client codex
+npx -y github:Destruction13/hermes-overlord-mcp config --client vscode
+npx -y github:Destruction13/hermes-overlord-mcp config --client cursor
+npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
+npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
+npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
+npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
+npx -y github:Destruction13/hermes-overlord-mcp config --client kiro
+npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity
+npx -y github:Destruction13/hermes-overlord-mcp config --client cline
+npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
+npx -y github:Destruction13/hermes-overlord-mcp config --client continue
+npx -y github:Destruction13/hermes-overlord-mcp config --client zed
 ```
 
-When you use the GitHub install path before npm publication, `npx` passes that
-package reference through to generated configs. The resulting client config uses
-`github:Destruction13/hermes-overlord-mcp` as the launch target instead of the
-future npm package name.
+When you use the GitHub install path, `npx` passes that package reference
+through to generated configs. The resulting client config keeps
+`github:Destruction13/hermes-overlord-mcp` as the launch target.
 
 VS Code-style clients that support `--add-mcp` can consume the flat payload from
 the `add-mcp` format:
@@ -94,10 +106,13 @@ contour:
 - Sanitized `SOUL.md`, `profile.yaml`, `config.template.yaml`, and
   `ENV_KEYS.txt` files for `overlord` and `ol*` profiles.
 - Selected skills needed to understand, audit, and extend the package.
-- Config snippets for generic MCP, VS Code, Cursor, Kilo, Kiro, Windsurf,
-  OpenCode, Codex, and Antigravity.
+- Config snippets for generic MCP, Claude Code, Codex, VS Code, Cursor,
+  Windsurf, OpenCode, Gemini CLI, Kilo, Kiro, Antigravity, Cline, Roo Code,
+  Continue, and Zed.
 - Flat `add-mcp` payloads for VS Code, Cursor, Kiro, and Antigravity CLI
   installs.
+- A generated `client-configs/INSTALL.md` guide with standard and
+  client-specific snippets.
 - Distribution docs and a machine-readable `MANIFEST.json` in generated builds.
 
 ## Excluded

@@ -5,12 +5,10 @@
       "command": "npx",
       "args": [
         "-y",
-        "@destruction13/hermes-overlord-mcp"
+        "github:Destruction13/hermes-overlord-mcp"
       ],
       "env": {
         "HERMES_HOME": "${HERMES_HOME}",
-        "HERMES_OVERLORD_ROOT": "${HERMES_ROOT}",
-        "HERMES_BRIDGE_ROOT": "${HERMES_ROOT}",
         "HERMES_BRIDGE_PROFILE": "overlord",
         "HERMES_BRIDGE_BOARD": "overlord",
         "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",

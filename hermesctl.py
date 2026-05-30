@@ -21,7 +21,53 @@ DEFAULT_HTTP_URL = "http://127.0.0.1:8765/mcp"
 MCP_SERVER_ID = "hermes-overlord"
 MCP_DISPLAY_NAME = "Hermes Overlord"
 NPM_PACKAGE_NAME = "@destruction13/hermes-overlord-mcp"
-SUPPORTED_CLIENTS = ("generic", "vscode", "cursor", "kilo", "kiro", "windsurf", "opencode", "codex", "antigravity")
+GITHUB_PACKAGE_NAME = "github:Destruction13/hermes-overlord-mcp"
+MCP_TOOL_NAMES = (
+    "hermes_submit_task",
+    "hermes_task_report",
+    "hermes_task_status",
+    "hermes_task_events",
+    "hermes_heartbeat_prompt",
+    "hermes_task_list",
+    "hermes_task_comment",
+    "hermes_task_log",
+    "hermes_dispatch_once",
+    "hermes_gateway_status",
+    "hermes_autocheck",
+    "hermes_direct_ask",
+)
+SUPPORTED_CLIENTS = (
+    "generic",
+    "claude-code",
+    "codex",
+    "vscode",
+    "cursor",
+    "windsurf",
+    "opencode",
+    "gemini-cli",
+    "kilo",
+    "kiro",
+    "antigravity",
+    "cline",
+    "roo-code",
+    "continue",
+    "zed",
+)
+CLIENT_ALIASES = {
+    "claude": "claude-code",
+    "claude_code": "claude-code",
+    "claudecode": "claude-code",
+    "open-code": "opencode",
+    "gemini": "gemini-cli",
+    "gemini_cli": "gemini-cli",
+    "geminicli": "gemini-cli",
+    "kilocode": "kilo",
+    "kilo-code": "kilo",
+    "roo": "roo-code",
+    "roo_code": "roo-code",
+    "roocode": "roo-code",
+}
+CLIENT_CHOICES = tuple(sorted(set(SUPPORTED_CLIENTS) | set(CLIENT_ALIASES)))
 ADD_MCP_CLIENTS = {"vscode", "cursor", "kiro", "antigravity"}
 TOP_LEVEL_SERVERS_CLIENTS = {"kiro", "antigravity"}
 PROFILE_EXPORT_RE = re.compile(r"^(overlord|ol[A-Za-z0-9_-]+)$")
@@ -317,16 +363,79 @@ def default_workspace() -> str:
     return f"dir:{Path.home()}"
 
 
-def server_env(client: str = "generic", hermes_home_path: Path | None = None, workspace: str | None = None, root: Path = ROOT) -> dict[str, str]:
-    return {
+def normalize_client(client: str) -> str:
+    normalized = client.strip().lower().replace(" ", "-")
+    normalized = CLIENT_ALIASES.get(normalized, normalized)
+    if normalized not in SUPPORTED_CLIENTS:
+        raise ValueError(f"unsupported client: {client}")
+    return normalized
+
+
+def client_display_name(client: str) -> str:
+    names = {
+        "generic": "Generic MCP",
+        "claude-code": "Claude Code",
+        "codex": "Codex",
+        "vscode": "VS Code / GitHub Copilot",
+        "cursor": "Cursor",
+        "windsurf": "Windsurf",
+        "opencode": "OpenCode",
+        "gemini-cli": "Gemini CLI",
+        "kilo": "Kilo Code",
+        "kiro": "Kiro",
+        "antigravity": "Antigravity",
+        "cline": "Cline",
+        "roo-code": "Roo Code",
+        "continue": "Continue",
+        "zed": "Zed",
+    }
+    return names[normalize_client(client)]
+
+
+def client_config_location(client: str) -> str:
+    locations = {
+        "generic": "Your client's MCP settings file",
+        "claude-code": "Claude Code local project scope or .mcp.json",
+        "codex": "~/.codex/config.toml through codex mcp add",
+        "vscode": ".vscode/mcp.json or VS Code user MCP settings",
+        "cursor": "Cursor MCP settings or project mcp.json",
+        "windsurf": "Windsurf Cascade MCP settings",
+        "opencode": "opencode.json",
+        "gemini-cli": "~/.gemini/settings.json",
+        "kilo": "Kilo Code MCP settings",
+        "kiro": ".kiro/settings/mcp.json or Kiro user MCP settings",
+        "antigravity": "~/.gemini/antigravity/mcp_config.json or plugin mcp_config.json",
+        "cline": "Cline MCP settings",
+        "roo-code": "Roo Code MCP settings",
+        "continue": ".continue config or MCP server settings",
+        "zed": "Zed settings.json context_servers",
+    }
+    return locations[normalize_client(client)]
+
+
+def shell_join(args: list[str]) -> str:
+    safe = re.compile(r"^[A-Za-z0-9_./:@+=,-]+$")
+    return " ".join(arg if safe.match(arg) else json.dumps(arg) for arg in args)
+
+
+def server_env(
+    client: str = "generic",
+    hermes_home_path: Path | None = None,
+    workspace: str | None = None,
+    root: Path = ROOT,
+    include_root: bool = True,
+) -> dict[str, str]:
+    client = normalize_client(client)
+    env = {
         "HERMES_HOME": str(hermes_home_path or hermes_home()),
-        "HERMES_OVERLORD_ROOT": str(root),
-        "HERMES_BRIDGE_ROOT": str(root),
         "HERMES_BRIDGE_PROFILE": DEFAULT_PROFILE,
         "HERMES_BRIDGE_BOARD": DEFAULT_BOARD,
         "HERMES_BRIDGE_WORKSPACE": workspace or default_workspace(),
         "HERMES_BRIDGE_CLIENT": client,
     }
+    if include_root:
+        env.update({"HERMES_OVERLORD_ROOT": str(root), "HERMES_BRIDGE_ROOT": str(root)})
+    return env
 
 
 def stdio_server_config(
@@ -337,7 +446,13 @@ def stdio_server_config(
     hermes_home_path: Path | None = None,
     workspace: str | None = None,
 ) -> dict[str, Any]:
-    env = server_env(client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root)
+    env = server_env(
+        client=client,
+        hermes_home_path=hermes_home_path,
+        workspace=workspace,
+        root=root,
+        include_root=launcher in {"node", "python"},
+    )
     if launcher == "python":
         return {
             "command": python_executable_for_config(),
@@ -350,7 +465,7 @@ def stdio_server_config(
 
 
 def http_server_config(http_url: str = DEFAULT_HTTP_URL, client: str = "generic", hermes_home_path: Path | None = None, workspace: str | None = None, root: Path = ROOT) -> dict[str, Any]:
-    return {"serverUrl": http_url, "url": http_url, "env": server_env(client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root)}
+    return {"serverUrl": http_url, "url": http_url, "env": server_env(client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root, include_root=False)}
 
 
 def build_mcp_config(
@@ -363,15 +478,7 @@ def build_mcp_config(
     hermes_home_path: Path | None = None,
     workspace: str | None = None,
 ) -> dict[str, Any]:
-    if client not in SUPPORTED_CLIENTS:
-        raise ValueError(f"unsupported client: {client}")
-    env = {
-        "HERMES_OVERLORD_ROOT": str(root),
-        "HERMES_BRIDGE_ROOT": str(root),
-        "HERMES_BRIDGE_PROFILE": DEFAULT_PROFILE,
-        "HERMES_BRIDGE_BOARD": DEFAULT_BOARD,
-        "HERMES_BRIDGE_WORKSPACE": workspace or default_workspace(),
-    }
+    client = normalize_client(client)
     stdio = stdio_server_config(root=root, client=client, package_name=package_name, launcher=launcher, hermes_home_path=hermes_home_path, workspace=workspace)
     http = http_server_config(http_url=http_url, client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root)
     if transport in {"http", "streamable-http", "streamable_http"}:
@@ -404,6 +511,21 @@ def build_mcp_config(
                 }
             }
         return {"mcp": {MCP_SERVER_ID: {"type": "remote", "url": http_url, "enabled": True}}}
+    if client == "zed":
+        if transport == "stdio":
+            return {
+                "context_servers": {
+                    MCP_SERVER_ID: {
+                        "source": "custom",
+                        "command": {
+                            "path": server["command"],
+                            "args": server.get("args", []),
+                            "env": server.get("env", {}),
+                        },
+                    }
+                }
+            }
+        return {"context_servers": {MCP_SERVER_ID: {"source": "custom", "url": http_url, "env": http["env"]}}}
     if client in TOP_LEVEL_SERVERS_CLIENTS:
         return {"servers": {MCP_SERVER_ID: server}}
     return {"mcpServers": {MCP_SERVER_ID: server}}
@@ -419,6 +541,7 @@ def build_add_mcp_config(
     hermes_home_path: Path | None = None,
     workspace: str | None = None,
 ) -> dict[str, Any]:
+    client = normalize_client(client)
     if transport in {"http", "streamable-http", "streamable_http"}:
         http = http_server_config(http_url=http_url, client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root)
         return {"name": MCP_SERVER_ID, "serverUrl": http["serverUrl"], "env": http["env"]}
@@ -428,11 +551,23 @@ def build_add_mcp_config(
 
 def write_client_configs(out_dir: Path, root: Path) -> None:
     config_dir = out_dir / "client-configs"
+    package_name = os.environ.get("HERMES_PUBLIC_PACKAGE_NAME", GITHUB_PACKAGE_NAME)
+    write_text(
+        config_dir / "INSTALL.md",
+        install_guide_markdown(
+            install_guide_data(
+                root=root,
+                package_name=package_name,
+                hermes_home_path=Path("${HERMES_HOME}"),
+                workspace="dir:${HERMES_WORKSPACE_ROOT}",
+            )
+        ),
+    )
     for client in SUPPORTED_CLIENTS:
         write_text(
             config_dir / f"{client}.stdio.json",
             json.dumps(
-                build_mcp_config(client, root=root, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
+                build_mcp_config(client, root=root, package_name=package_name, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
                 ensure_ascii=False,
                 indent=2,
             ),
@@ -441,7 +576,7 @@ def write_client_configs(out_dir: Path, root: Path) -> None:
             write_text(
                 config_dir / f"{client}.add-mcp.json",
                 json.dumps(
-                    build_add_mcp_config(client, root=root, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
+                    build_add_mcp_config(client, root=root, package_name=package_name, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
                     ensure_ascii=False,
                     indent=2,
                 ),
@@ -453,6 +588,7 @@ def write_client_configs(out_dir: Path, root: Path) -> None:
                     client,
                     root=root,
                     transport="streamable-http",
+                    package_name=package_name,
                     hermes_home_path=Path("${HERMES_HOME}"),
                     workspace="dir:${HERMES_WORKSPACE_ROOT}",
                 ),
@@ -477,7 +613,7 @@ def write_client_configs(out_dir: Path, root: Path) -> None:
     write_text(
         plugin_dir / "mcp_config.json",
         json.dumps(
-            build_mcp_config("antigravity", root=root, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
+            build_mcp_config("antigravity", root=root, package_name=package_name, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
             ensure_ascii=False,
             indent=2,
         ),
@@ -589,8 +725,7 @@ def init_install(
     http_url: str = DEFAULT_HTTP_URL,
     out: Path | None = None,
 ) -> dict[str, Any]:
-    if client not in SUPPORTED_CLIENTS:
-        raise ValueError(f"unsupported client: {client}")
+    client = normalize_client(client)
     target_home = (home or hermes_home()).expanduser()
     target_home.mkdir(parents=True, exist_ok=True)
     template = portable_template_root(root)
@@ -626,6 +761,230 @@ def init_install(
             f"Run: npx -y {package_name} doctor",
         ],
     }
+
+
+def install_command_for_client(client: str, package_name: str = NPM_PACKAGE_NAME) -> list[str] | None:
+    client = normalize_client(client)
+    if client == "claude-code":
+        return [
+            "claude",
+            "mcp",
+            "add",
+            MCP_SERVER_ID,
+            "--scope",
+            "local",
+            "-e",
+            "HERMES_BRIDGE_CLIENT=claude-code",
+            "--",
+            "npx",
+            "-y",
+            package_name,
+        ]
+    if client == "codex":
+        return [
+            "codex",
+            "mcp",
+            "add",
+            MCP_SERVER_ID,
+            "--env",
+            "HERMES_BRIDGE_CLIENT=codex",
+            "--",
+            "npx",
+            "-y",
+            package_name,
+        ]
+    return None
+
+
+def install_snippet(
+    client: str,
+    root: Path = ROOT,
+    transport: str = "stdio",
+    http_url: str = DEFAULT_HTTP_URL,
+    package_name: str = NPM_PACKAGE_NAME,
+    launcher: str = "npx",
+    hermes_home_path: Path | None = None,
+    workspace: str | None = None,
+) -> dict[str, Any]:
+    client = normalize_client(client)
+    config = build_mcp_config(
+        client,
+        root=root,
+        transport=transport,
+        http_url=http_url,
+        package_name=package_name,
+        launcher=launcher,
+        hermes_home_path=hermes_home_path,
+        workspace=workspace,
+    )
+    add_mcp = build_add_mcp_config(
+        client,
+        root=root,
+        transport=transport,
+        http_url=http_url,
+        package_name=package_name,
+        launcher=launcher,
+        hermes_home_path=hermes_home_path,
+        workspace=workspace,
+    )
+    command = install_command_for_client(client, package_name=package_name)
+    if command:
+        primary = {"kind": "command", "command": shell_join(command)}
+    elif client in ADD_MCP_CLIENTS:
+        primary = {
+            "kind": "add-mcp-json",
+            "command": shell_join(["npx", "-y", package_name, "config", "--client", client, "--format", "add-mcp"]),
+            "config": add_mcp,
+        }
+    else:
+        primary = {
+            "kind": "config-json",
+            "command": shell_join(["npx", "-y", package_name, "config", "--client", client]),
+            "config": config,
+        }
+    return {
+        "client": client,
+        "display_name": client_display_name(client),
+        "server_id": MCP_SERVER_ID,
+        "config_location": client_config_location(client),
+        "transport": transport,
+        "primary": primary,
+        "config": config,
+    }
+
+
+def install_guide_data(
+    client: str = "all",
+    root: Path = ROOT,
+    transport: str = "stdio",
+    http_url: str = DEFAULT_HTTP_URL,
+    package_name: str = NPM_PACKAGE_NAME,
+    launcher: str = "npx",
+    hermes_home_path: Path | None = None,
+    workspace: str | None = None,
+) -> dict[str, Any]:
+    clients = [item for item in SUPPORTED_CLIENTS if item != "generic"] if client == "all" else [normalize_client(client)]
+    standard = build_mcp_config(
+        "generic",
+        root=root,
+        transport=transport,
+        http_url=http_url,
+        package_name=package_name,
+        launcher=launcher,
+        hermes_home_path=hermes_home_path,
+        workspace=workspace,
+    )
+    return {
+        "schema_version": 1,
+        "ok": True,
+        "action": "install-guide",
+        "server_id": MCP_SERVER_ID,
+        "display_name": MCP_DISPLAY_NAME,
+        "package_name": package_name,
+        "requirements": ["Node.js 20 or newer", "Python 3", "An MCP-compatible client"],
+        "standard_config": {"mcpServers": standard["mcpServers"]},
+        "tools": list(MCP_TOOL_NAMES),
+        "clients": [
+            install_snippet(
+                item,
+                root=root,
+                transport=transport,
+                http_url=http_url,
+                package_name=package_name,
+                launcher=launcher,
+                hermes_home_path=hermes_home_path,
+                workspace=workspace,
+            )
+            for item in clients
+        ],
+    }
+
+
+def install_guide_markdown(data: dict[str, Any]) -> str:
+    lines = [
+        "# Install Hermes Overlord MCP",
+        "",
+        "## Standard configuration for most tools",
+        "",
+        "Use this JSON when your client accepts a normal `mcpServers` object:",
+        "",
+        "```json",
+        json.dumps(data["standard_config"], ensure_ascii=False, indent=2),
+        "```",
+        "",
+        "## Requirements",
+        "",
+    ]
+    for requirement in data["requirements"]:
+        lines.append(f"- {requirement}")
+    lines.extend(
+        [
+            "",
+            "## Client-specific configuration",
+            "",
+            "Each client stores MCP settings differently. The server stays the same; only this adapter changes.",
+            "",
+        ]
+    )
+    for item in data["clients"]:
+        lines.extend(
+            [
+                f"<details{(' open' if item['client'] == 'claude-code' else '')}>",
+                f"<summary>{item['display_name']}</summary>",
+                "",
+                f"Config location: `{item['config_location']}`.",
+                "",
+            ]
+        )
+        primary = item["primary"]
+        if primary["kind"] == "command":
+            lines.extend(["```bash", primary["command"], "```", ""])
+        elif primary["kind"] == "add-mcp-json":
+            lines.extend(
+                [
+                    "Generate the flat add-mcp payload:",
+                    "",
+                    "```bash",
+                    primary["command"],
+                    "```",
+                    "",
+                    "Payload:",
+                    "",
+                    "```json",
+                    json.dumps(primary["config"], ensure_ascii=False, indent=2),
+                    "```",
+                    "",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    "Generate the client config snippet:",
+                    "",
+                    "```bash",
+                    primary["command"],
+                    "```",
+                    "",
+                    "Snippet:",
+                    "",
+                    "```json",
+                    json.dumps(primary["config"], ensure_ascii=False, indent=2),
+                    "```",
+                    "",
+                ]
+            )
+        lines.extend(["</details>", ""])
+    lines.extend(
+        [
+            "## Health check",
+            "",
+            "```bash",
+            f"npx -y {data['package_name']} doctor",
+            "```",
+            "",
+        ]
+    )
+    return "\n".join(lines)
 
 
 def path_size(path: Path) -> int:
@@ -924,7 +1283,7 @@ def build_parser() -> argparse.ArgumentParser:
     package_cmd.add_argument("--hermes-home", default=None)
 
     config_cmd = sub.add_parser("mcp-config", aliases=["config"], help="Generate MCP client config")
-    config_cmd.add_argument("--client", choices=list(SUPPORTED_CLIENTS), required=True)
+    config_cmd.add_argument("--client", choices=list(CLIENT_CHOICES), required=True)
     config_cmd.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
     config_cmd.add_argument("--root", default=str(ROOT))
     config_cmd.add_argument("--http-url", default=DEFAULT_HTTP_URL)
@@ -936,7 +1295,7 @@ def build_parser() -> argparse.ArgumentParser:
     config_cmd.add_argument("--out", default=None)
 
     init_cmd = sub.add_parser("init", help="Initialize a user-local Hermes MCP home and config snippet")
-    init_cmd.add_argument("--client", choices=list(SUPPORTED_CLIENTS), default="generic")
+    init_cmd.add_argument("--client", choices=list(CLIENT_CHOICES), default="generic")
     init_cmd.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
     init_cmd.add_argument("--root", default=str(ROOT))
     init_cmd.add_argument("--http-url", default=DEFAULT_HTTP_URL)
@@ -946,6 +1305,17 @@ def build_parser() -> argparse.ArgumentParser:
     init_cmd.add_argument("--workspace", default=None)
     init_cmd.add_argument("--out", default=None)
     init_cmd.add_argument("--force", action="store_true")
+
+    install_cmd = sub.add_parser("install", help="Print a screenshot-style install guide for MCP clients")
+    install_cmd.add_argument("--client", choices=["all", *CLIENT_CHOICES], default="all")
+    install_cmd.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
+    install_cmd.add_argument("--root", default=str(ROOT))
+    install_cmd.add_argument("--http-url", default=DEFAULT_HTTP_URL)
+    install_cmd.add_argument("--package-name", default=default_package_name())
+    install_cmd.add_argument("--launcher", choices=["npx", "node", "python"], default="npx")
+    install_cmd.add_argument("--hermes-home", default=None)
+    install_cmd.add_argument("--workspace", default=None)
+    install_cmd.add_argument("--format", choices=["markdown", "json"], default="markdown")
 
     clean_cmd = sub.add_parser("clean-audit", help="Audit or quarantine non-shareable local artifacts")
     clean_cmd.add_argument("--quarantine", action="store_true")
@@ -997,6 +1367,22 @@ def main(argv: list[str] | None = None) -> int:
                     out=out,
                 )
             )
+        elif args.command == "install":
+            home = Path(args.hermes_home).expanduser() if args.hermes_home else None
+            data = install_guide_data(
+                client=args.client,
+                root=Path(args.root),
+                transport=args.transport,
+                http_url=args.http_url,
+                package_name=args.package_name,
+                launcher=args.launcher,
+                hermes_home_path=home,
+                workspace=args.workspace,
+            )
+            if args.format == "json":
+                print_json(data)
+            else:
+                print(install_guide_markdown(data))
         elif args.command == "clean-audit":
             qdir = Path(args.quarantine_dir).expanduser() if args.quarantine_dir else None
             print_json(clean_audit(quarantine=args.quarantine, quarantine_dir=qdir))

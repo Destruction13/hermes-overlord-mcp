@@ -8,19 +8,23 @@ The server id is `hermes-overlord`. The display name is `Hermes Overlord`.
 
 ## Quick start
 
-Install or run Hermes from GitHub with `npx`:
+Install or run Hermes from the public GitHub package with `npx`:
 
 ```bash
+npx -y github:Destruction13/hermes-overlord-mcp install
 npx -y github:Destruction13/hermes-overlord-mcp init --client generic
 npx -y github:Destruction13/hermes-overlord-mcp doctor
 ```
 
-The GitHub form requires access to the repository until the package is public
-or published to npm.
+The `install` command prints a screenshot-style guide: standard JSON for most
+MCP clients, requirements, and client-specific snippets for Claude Code, Codex,
+VS Code, Cursor, Windsurf, OpenCode, Gemini CLI, Kilo, Kiro, Antigravity,
+Cline, Roo Code, Continue, and Zed.
 
 After the package is published to npm, use the package name directly:
 
 ```bash
+npx -y @destruction13/hermes-overlord-mcp install
 npx -y @destruction13/hermes-overlord-mcp init --client generic
 npx -y @destruction13/hermes-overlord-mcp doctor
 ```
@@ -33,9 +37,9 @@ is:
   "mcpServers": {
     "hermes-overlord": {
       "command": "npx",
-      "args": ["-y", "@destruction13/hermes-overlord-mcp"],
+      "args": ["-y", "github:Destruction13/hermes-overlord-mcp"],
       "env": {
-        "HERMES_HOME": "~/.hermes"
+        "HERMES_BRIDGE_CLIENT": "generic"
       }
     }
   }
@@ -45,27 +49,35 @@ is:
 Use `config` to generate client-specific snippets:
 
 ```bash
-npx -y @destruction13/hermes-overlord-mcp config --client generic
-npx -y @destruction13/hermes-overlord-mcp config --client vscode
-npx -y @destruction13/hermes-overlord-mcp config --client cursor
-npx -y @destruction13/hermes-overlord-mcp config --client kilo
-npx -y @destruction13/hermes-overlord-mcp config --client kiro
-npx -y @destruction13/hermes-overlord-mcp config --client windsurf
-npx -y @destruction13/hermes-overlord-mcp config --client opencode
+npx -y github:Destruction13/hermes-overlord-mcp config --client generic
+npx -y github:Destruction13/hermes-overlord-mcp config --client claude-code
+npx -y github:Destruction13/hermes-overlord-mcp config --client codex
+npx -y github:Destruction13/hermes-overlord-mcp config --client vscode
+npx -y github:Destruction13/hermes-overlord-mcp config --client cursor
+npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
+npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
+npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
+npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
+npx -y github:Destruction13/hermes-overlord-mcp config --client kiro
+npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity
+npx -y github:Destruction13/hermes-overlord-mcp config --client cline
+npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
+npx -y github:Destruction13/hermes-overlord-mcp config --client continue
+npx -y github:Destruction13/hermes-overlord-mcp config --client zed
 ```
 
-When you run from GitHub before npm publication, generated snippets keep the
-GitHub package reference automatically:
+For Claude Code and Codex, `install --client` prints the direct CLI command:
 
 ```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
+npx -y github:Destruction13/hermes-overlord-mcp install --client claude-code
+npx -y github:Destruction13/hermes-overlord-mcp install --client codex
 ```
 
 VS Code-style clients that expose `--add-mcp`, including VS Code, Cursor, Kiro,
 and Antigravity, can use the flat install payload:
 
 ```bash
-npx -y @destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
+npx -y github:Destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
 ```
 
 ## What the MCP exposes
@@ -93,6 +105,7 @@ profiles, skills, MCP/tool usage, review, watchdog, and synthesis.
 ```bash
 hermes-overlord-mcp                 # start MCP over stdio
 hermes-overlord-mcp init            # create HERMES_HOME templates and config
+hermes-overlord-mcp install         # print install guide/client snippets
 hermes-overlord-mcp config          # print MCP config JSON
 hermes-overlord-mcp doctor          # check local readiness
 hermes-overlord-mcp start-http      # start Streamable HTTP on localhost
@@ -104,7 +117,7 @@ hermes-overlord-mcp clean-audit     # audit non-shareable local files
 remote gateways:
 
 ```bash
-npx -y @destruction13/hermes-overlord-mcp start-http --host 127.0.0.1 --port 8765
+npx -y github:Destruction13/hermes-overlord-mcp start-http --host 127.0.0.1 --port 8765
 ```
 
 Remote HTTP exposure must add explicit authentication and network controls.

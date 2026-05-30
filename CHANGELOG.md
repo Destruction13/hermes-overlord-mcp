@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-05-30 - Public MCP install surface
+
+- Added `hermes-overlord-mcp install` for a screenshot-style install guide with
+  standard MCP JSON, requirements, and client-specific setup snippets.
+- Added generated config presets for Claude Code, Gemini CLI, Cline, Roo Code,
+  Continue, and Zed, while keeping Codex, VS Code, Cursor, Windsurf, OpenCode,
+  Kilo, Kiro, and Antigravity support.
+- Stopped pinning npx-generated configs to a local package cache root, so public
+  GitHub installs stay portable across machines.
+
 ## 2026-05-25 — Workflow clarity and theme repair
 
 - Split constructor node positions by view so Flow layout edits no longer move the same profile inside MCP maps.

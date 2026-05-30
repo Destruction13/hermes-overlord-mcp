@@ -1,7 +1,7 @@
 {
   "name": "@destruction13/hermes-overlord-mcp",
-  "version": "1.0.0",
-  "description": "Client-neutral Hermes Overlord MCP server with npx install and config generators for MCP-compatible IDEs.",
+  "version": "1.1.0",
+  "description": "Client-neutral Hermes Overlord MCP server with npx install guides and config generators for MCP-compatible IDEs.",
   "type": "module",
   "bin": {
     "hermes-overlord-mcp": "./bin/hermes-overlord-mcp.js"
@@ -13,6 +13,7 @@
     "clean:audit": "python hermesctl.py clean-audit",
     "mcp:stdio": "node ./bin/hermes-overlord-mcp.js",
     "mcp:http": "node ./bin/hermes-overlord-mcp.js start-http",
+    "install:guide": "node ./bin/hermes-overlord-mcp.js install",
     "config:generic": "node ./bin/hermes-overlord-mcp.js config --client generic",
     "init:generic": "node ./bin/hermes-overlord-mcp.js init --client generic"
   },

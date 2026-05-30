@@ -23,12 +23,18 @@ class HermesCtlTests(unittest.TestCase):
     def test_mcp_config_shapes(self) -> None:
         root = Path("/opt/hermes")
 
+        claude = hermesctl.build_mcp_config("claude-code", root=root, hermes_home_path=Path("/home/user/.hermes"))
+        codex = hermesctl.build_mcp_config("codex", root=root, hermes_home_path=Path("/home/user/.hermes"))
         antigravity = hermesctl.build_mcp_config("antigravity", root=root, hermes_home_path=Path("/home/user/.hermes"))
         vscode = hermesctl.build_mcp_config("vscode", root=root, hermes_home_path=Path("/home/user/.hermes"))
         cursor = hermesctl.build_mcp_config("cursor", root=root, hermes_home_path=Path("/home/user/.hermes"))
         opencode = hermesctl.build_mcp_config("opencode", root=root, hermes_home_path=Path("/home/user/.hermes"))
+        gemini = hermesctl.build_mcp_config("gemini", root=root, hermes_home_path=Path("/home/user/.hermes"))
+        zed = hermesctl.build_mcp_config("zed", root=root, hermes_home_path=Path("/home/user/.hermes"))
         generic_http = hermesctl.build_mcp_config("generic", root=root, transport="streamable-http")
 
+        self.assertIn("hermes-overlord", claude["mcpServers"])
+        self.assertIn("hermes-overlord", codex["mcpServers"])
         self.assertIn("servers", antigravity)
         self.assertIn("hermes-overlord", antigravity["servers"])
         self.assertEqual(antigravity["servers"]["hermes-overlord"]["command"], "npx")
@@ -36,8 +42,19 @@ class HermesCtlTests(unittest.TestCase):
         self.assertIn("servers", cursor["mcp"])
         self.assertIn("mcp", opencode)
         self.assertEqual(opencode["mcp"]["hermes-overlord"]["command"][:2], ["npx", "-y"])
+        self.assertEqual(gemini["mcpServers"]["hermes-overlord"]["env"]["HERMES_BRIDGE_CLIENT"], "gemini-cli")
+        self.assertIn("context_servers", zed)
+        self.assertEqual(zed["context_servers"]["hermes-overlord"]["command"]["path"], "npx")
         self.assertIn("streamable_http", generic_http)
         self.assertIn("serverUrl", generic_http["streamable_http"])
+
+    def test_npx_configs_do_not_pin_package_cache_root(self) -> None:
+        config = hermesctl.build_mcp_config("generic", root=Path("/opt/hermes"), package_name="github:Destruction13/hermes-overlord-mcp")
+        env = config["mcpServers"]["hermes-overlord"]["env"]
+
+        self.assertNotIn("HERMES_OVERLORD_ROOT", env)
+        self.assertNotIn("HERMES_BRIDGE_ROOT", env)
+        self.assertEqual(config["mcpServers"]["hermes-overlord"]["args"], ["-y", "github:Destruction13/hermes-overlord-mcp"])
 
     def test_add_mcp_shape_and_package_override(self) -> None:
         root = Path("/opt/hermes")
@@ -53,6 +70,21 @@ class HermesCtlTests(unittest.TestCase):
         self.assertEqual(add_mcp["command"], "npx")
         self.assertEqual(add_mcp["args"], ["-y", "github:Destruction13/hermes-overlord-mcp"])
         self.assertEqual(add_mcp["env"]["HERMES_BRIDGE_CLIENT"], "kiro")
+
+    def test_install_guide_has_standard_and_client_specific_snippets(self) -> None:
+        data = hermesctl.install_guide_data(client="all", package_name="github:Destruction13/hermes-overlord-mcp")
+        markdown = hermesctl.install_guide_markdown(data)
+        by_client = {item["client"]: item for item in data["clients"]}
+
+        self.assertIn("mcpServers", data["standard_config"])
+        self.assertIn("claude-code", by_client)
+        self.assertIn("codex", by_client)
+        self.assertIn("zed", by_client)
+        self.assertIn("claude mcp add hermes-overlord", by_client["claude-code"]["primary"]["command"])
+        self.assertIn("codex mcp add hermes-overlord", by_client["codex"]["primary"]["command"])
+        self.assertIn("context_servers", by_client["zed"]["config"])
+        self.assertIn("<summary>Claude Code</summary>", markdown)
+        self.assertIn("## Requirements", markdown)
 
     def test_default_package_name_uses_npx_package_reference(self) -> None:
         with mock.patch.dict(os.environ, {"npm_config_package": "github:Destruction13/hermes-overlord-mcp"}, clear=False):
@@ -160,9 +192,13 @@ mcp_servers:
             self.assertIn("OMNIROUTE_API_KEY", env_keys)
             self.assertEqual(findings, [])
             json.loads((out / "client-configs" / "antigravity.stdio.json").read_text(encoding="utf-8"))
+            generic_config = json.loads((out / "client-configs" / "generic.stdio.json").read_text(encoding="utf-8"))
             add_mcp = json.loads((out / "client-configs" / "kiro.add-mcp.json").read_text(encoding="utf-8"))
+            install_doc = (out / "client-configs" / "INSTALL.md").read_text(encoding="utf-8")
+            self.assertEqual(generic_config["mcpServers"]["hermes-overlord"]["args"], ["-y", "github:Destruction13/hermes-overlord-mcp"])
             self.assertEqual(add_mcp["name"], "hermes-overlord")
             self.assertEqual(add_mcp["command"], "npx")
+            self.assertIn("Client-specific configuration", install_doc)
 
 
 if __name__ == "__main__":

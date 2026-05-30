@@ -1,14 +1,14 @@
 {
-  "mcpServers": {
+  "context_servers": {
     "hermes-overlord": {
-      "serverUrl": "http://127.0.0.1:8765/mcp",
+      "source": "custom",
       "url": "http://127.0.0.1:8765/mcp",
       "env": {
         "HERMES_HOME": "${HERMES_HOME}",
         "HERMES_BRIDGE_PROFILE": "overlord",
         "HERMES_BRIDGE_BOARD": "overlord",
         "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",
-        "HERMES_BRIDGE_CLIENT": "codex"
+        "HERMES_BRIDGE_CLIENT": "zed"
       }
     }
   }

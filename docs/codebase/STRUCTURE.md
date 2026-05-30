@@ -32,7 +32,8 @@ The generated portable template keeps only shareable files:
 
 - `runtime/profiles/*`: sanitized `SOUL.md`, `profile.yaml`,
   `config.template.yaml`, and `ENV_KEYS.txt`.
-- `client-configs/`: JSON snippets for supported MCP clients.
+- `client-configs/`: JSON snippets and `INSTALL.md` for supported MCP
+  clients.
 - `skills/`: selected skills required to understand, audit, and extend Hermes.
 
 ## Evidence

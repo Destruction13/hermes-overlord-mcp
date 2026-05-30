@@ -6,14 +6,20 @@ Hermes Overlord MCP is not tied to one IDE. The core server is the same for all
 clients, and `hermesctl.py mcp-config` generates snippets for these targets:
 
 - `generic`
+- `claude-code`
+- `codex`
 - `vscode`
 - `cursor`
-- `kilo`
-- `kiro`
 - `windsurf`
 - `opencode`
-- `codex`
+- `gemini-cli`
+- `kilo`
+- `kiro`
 - `antigravity`
+- `cline`
+- `roo-code`
+- `continue`
+- `zed`
 
 Unknown clients can use the `generic` `mcpServers` snippet if they support
 local `stdio` MCP servers.
@@ -21,6 +27,10 @@ local `stdio` MCP servers.
 VS Code-style clients that expose `--add-mcp`, including VS Code, Cursor, Kiro,
 and Antigravity, can use `hermesctl.py mcp-config --client <client> --format
 add-mcp` to generate the flat install payload accepted by that CLI flag.
+
+`hermesctl.py install` prints a screenshot-style installation guide with one
+standard `mcpServers` block and per-client setup snippets. The same guide is
+exported to `client-configs/INSTALL.md` when building the portable package.
 
 ## Hermes gateways
 

@@ -8,7 +8,7 @@
         "HERMES_BRIDGE_PROFILE": "overlord",
         "HERMES_BRIDGE_BOARD": "overlord",
         "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",
-        "HERMES_BRIDGE_CLIENT": "codex"
+        "HERMES_BRIDGE_CLIENT": "cline"
       }
     }
   }
