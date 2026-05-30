@@ -15,6 +15,9 @@ npx -y github:Destruction13/hermes-overlord-mcp init --client generic
 npx -y github:Destruction13/hermes-overlord-mcp doctor
 ```
 
+The GitHub form requires access to the repository until the package is public
+or published to npm.
+
 After the package is published to npm, use the package name directly:
 
 ```bash
@@ -49,6 +52,20 @@ npx -y @destruction13/hermes-overlord-mcp config --client kilo
 npx -y @destruction13/hermes-overlord-mcp config --client kiro
 npx -y @destruction13/hermes-overlord-mcp config --client windsurf
 npx -y @destruction13/hermes-overlord-mcp config --client opencode
+```
+
+When you run from GitHub before npm publication, generated snippets keep the
+GitHub package reference automatically:
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
+```
+
+VS Code-style clients that expose `--add-mcp`, including VS Code, Cursor, Kiro,
+and Antigravity, can use the flat install payload:
+
+```bash
+npx -y @destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
 ```
 
 ## What the MCP exposes

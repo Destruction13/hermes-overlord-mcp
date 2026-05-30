@@ -18,6 +18,10 @@ clients, and `hermesctl.py mcp-config` generates snippets for these targets:
 Unknown clients can use the `generic` `mcpServers` snippet if they support
 local `stdio` MCP servers.
 
+VS Code-style clients that expose `--add-mcp`, including VS Code, Cursor, Kiro,
+and Antigravity, can use `hermesctl.py mcp-config --client <client> --format
+add-mcp` to generate the flat install payload accepted by that CLI flag.
+
 ## Hermes gateways
 
 The bridge delegates real work to the configured Hermes runtime. The runtime can

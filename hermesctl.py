@@ -22,6 +22,8 @@ MCP_SERVER_ID = "hermes-overlord"
 MCP_DISPLAY_NAME = "Hermes Overlord"
 NPM_PACKAGE_NAME = "@destruction13/hermes-overlord-mcp"
 SUPPORTED_CLIENTS = ("generic", "vscode", "cursor", "kilo", "kiro", "windsurf", "opencode", "codex", "antigravity")
+ADD_MCP_CLIENTS = {"vscode", "cursor", "kiro", "antigravity"}
+TOP_LEVEL_SERVERS_CLIENTS = {"kiro", "antigravity"}
 PROFILE_EXPORT_RE = re.compile(r"^(overlord|ol[A-Za-z0-9_-]+)$")
 SECRET_KEY_RE = re.compile(r"(?i)(api[_-]?key|token|secret|password|cookie|authorization|client[_-]?secret|refresh[_-]?token)")
 SECRET_ASSIGNMENT_RE = re.compile(
@@ -279,6 +281,16 @@ def python_executable_for_config() -> str:
     return os.environ.get("HERMES_PYTHON") or "python"
 
 
+def default_package_name() -> str:
+    explicit = os.environ.get("HERMES_MCP_PACKAGE_NAME")
+    if explicit:
+        return explicit
+    npx_package = os.environ.get("npm_config_package")
+    if npx_package:
+        return npx_package
+    return NPM_PACKAGE_NAME
+
+
 def default_workspace() -> str:
     return f"dir:{Path.home()}"
 
@@ -355,6 +367,8 @@ def build_mcp_config(
     if client == "vscode":
         vscode_server = {"type": "stdio", **server} if transport == "stdio" else {"type": "http", "url": http_url, "env": http["env"]}
         return {"servers": {MCP_SERVER_ID: vscode_server}}
+    if client == "cursor":
+        return {"mcp": {"servers": {MCP_SERVER_ID: server}}}
     if client == "opencode":
         if transport == "stdio":
             return {
@@ -368,7 +382,26 @@ def build_mcp_config(
                 }
             }
         return {"mcp": {MCP_SERVER_ID: {"type": "remote", "url": http_url, "enabled": True}}}
+    if client in TOP_LEVEL_SERVERS_CLIENTS:
+        return {"servers": {MCP_SERVER_ID: server}}
     return {"mcpServers": {MCP_SERVER_ID: server}}
+
+
+def build_add_mcp_config(
+    client: str,
+    root: Path = ROOT,
+    transport: str = "stdio",
+    http_url: str = DEFAULT_HTTP_URL,
+    package_name: str = NPM_PACKAGE_NAME,
+    launcher: str = "npx",
+    hermes_home_path: Path | None = None,
+    workspace: str | None = None,
+) -> dict[str, Any]:
+    if transport in {"http", "streamable-http", "streamable_http"}:
+        http = http_server_config(http_url=http_url, client=client, hermes_home_path=hermes_home_path, workspace=workspace, root=root)
+        return {"name": MCP_SERVER_ID, "serverUrl": http["serverUrl"], "env": http["env"]}
+    stdio = stdio_server_config(root=root, client=client, package_name=package_name, launcher=launcher, hermes_home_path=hermes_home_path, workspace=workspace)
+    return {"name": MCP_SERVER_ID, **stdio}
 
 
 def write_client_configs(out_dir: Path, root: Path) -> None:
@@ -382,6 +415,15 @@ def write_client_configs(out_dir: Path, root: Path) -> None:
                 indent=2,
             ),
         )
+        if client in ADD_MCP_CLIENTS:
+            write_text(
+                config_dir / f"{client}.add-mcp.json",
+                json.dumps(
+                    build_add_mcp_config(client, root=root, hermes_home_path=Path("${HERMES_HOME}"), workspace="dir:${HERMES_WORKSPACE_ROOT}"),
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+            )
         write_text(
             config_dir / f"{client}.http.json",
             json.dumps(
@@ -864,10 +906,11 @@ def build_parser() -> argparse.ArgumentParser:
     config_cmd.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
     config_cmd.add_argument("--root", default=str(ROOT))
     config_cmd.add_argument("--http-url", default=DEFAULT_HTTP_URL)
-    config_cmd.add_argument("--package-name", default=NPM_PACKAGE_NAME)
+    config_cmd.add_argument("--package-name", default=default_package_name())
     config_cmd.add_argument("--launcher", choices=["npx", "node", "python"], default="npx")
     config_cmd.add_argument("--hermes-home", default=None)
     config_cmd.add_argument("--workspace", default=None)
+    config_cmd.add_argument("--format", choices=["config", "add-mcp"], default="config")
     config_cmd.add_argument("--out", default=None)
 
     init_cmd = sub.add_parser("init", help="Initialize a user-local Hermes MCP home and config snippet")
@@ -875,7 +918,7 @@ def build_parser() -> argparse.ArgumentParser:
     init_cmd.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
     init_cmd.add_argument("--root", default=str(ROOT))
     init_cmd.add_argument("--http-url", default=DEFAULT_HTTP_URL)
-    init_cmd.add_argument("--package-name", default=NPM_PACKAGE_NAME)
+    init_cmd.add_argument("--package-name", default=default_package_name())
     init_cmd.add_argument("--launcher", choices=["npx", "node", "python"], default="npx")
     init_cmd.add_argument("--hermes-home", default=None)
     init_cmd.add_argument("--workspace", default=None)
@@ -901,7 +944,8 @@ def main(argv: list[str] | None = None) -> int:
             print_json(package(Path(args.out), home=home))
         elif args.command in {"mcp-config", "config"}:
             home = Path(args.hermes_home).expanduser() if args.hermes_home else None
-            data = build_mcp_config(
+            builder = build_add_mcp_config if args.format == "add-mcp" else build_mcp_config
+            data = builder(
                 args.client,
                 root=Path(args.root),
                 transport=args.transport,

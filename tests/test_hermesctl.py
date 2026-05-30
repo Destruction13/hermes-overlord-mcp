@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import hermesctl
 
@@ -23,16 +25,38 @@ class HermesCtlTests(unittest.TestCase):
 
         antigravity = hermesctl.build_mcp_config("antigravity", root=root, hermes_home_path=Path("/home/user/.hermes"))
         vscode = hermesctl.build_mcp_config("vscode", root=root, hermes_home_path=Path("/home/user/.hermes"))
+        cursor = hermesctl.build_mcp_config("cursor", root=root, hermes_home_path=Path("/home/user/.hermes"))
         opencode = hermesctl.build_mcp_config("opencode", root=root, hermes_home_path=Path("/home/user/.hermes"))
         generic_http = hermesctl.build_mcp_config("generic", root=root, transport="streamable-http")
 
-        self.assertIn("mcpServers", antigravity)
-        self.assertIn("hermes-overlord", antigravity["mcpServers"])
-        self.assertEqual(antigravity["mcpServers"]["hermes-overlord"]["command"], "npx")
+        self.assertIn("servers", antigravity)
+        self.assertIn("hermes-overlord", antigravity["servers"])
+        self.assertEqual(antigravity["servers"]["hermes-overlord"]["command"], "npx")
         self.assertIn("servers", vscode)
+        self.assertIn("servers", cursor["mcp"])
         self.assertIn("mcp", opencode)
+        self.assertEqual(opencode["mcp"]["hermes-overlord"]["command"][:2], ["npx", "-y"])
         self.assertIn("streamable_http", generic_http)
         self.assertIn("serverUrl", generic_http["streamable_http"])
+
+    def test_add_mcp_shape_and_package_override(self) -> None:
+        root = Path("/opt/hermes")
+
+        add_mcp = hermesctl.build_add_mcp_config(
+            "kiro",
+            root=root,
+            hermes_home_path=Path("/home/user/.hermes"),
+            package_name="github:Destruction13/hermes-overlord-mcp",
+        )
+
+        self.assertEqual(add_mcp["name"], "hermes-overlord")
+        self.assertEqual(add_mcp["command"], "npx")
+        self.assertEqual(add_mcp["args"], ["-y", "github:Destruction13/hermes-overlord-mcp"])
+        self.assertEqual(add_mcp["env"]["HERMES_BRIDGE_CLIENT"], "kiro")
+
+    def test_default_package_name_uses_npx_package_reference(self) -> None:
+        with mock.patch.dict(os.environ, {"npm_config_package": "github:Destruction13/hermes-overlord-mcp"}, clear=False):
+            self.assertEqual(hermesctl.default_package_name(), "github:Destruction13/hermes-overlord-mcp")
 
     def test_init_install_writes_home_templates_and_config(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -113,6 +137,9 @@ mcp_servers:
             self.assertIn("OMNIROUTE_API_KEY", env_keys)
             self.assertEqual(findings, [])
             json.loads((out / "client-configs" / "antigravity.stdio.json").read_text(encoding="utf-8"))
+            add_mcp = json.loads((out / "client-configs" / "kiro.add-mcp.json").read_text(encoding="utf-8"))
+            self.assertEqual(add_mcp["name"], "hermes-overlord")
+            self.assertEqual(add_mcp["command"], "npx")
 
 
 if __name__ == "__main__":

@@ -13,6 +13,9 @@ npx -y github:Destruction13/hermes-overlord-mcp init --client generic
 npx -y github:Destruction13/hermes-overlord-mcp doctor
 ```
 
+The GitHub form requires repository access until the repository is public or the
+package is published to npm.
+
 Use npm after publication:
 
 ```bash
@@ -31,6 +34,21 @@ npx -y @destruction13/hermes-overlord-mcp config --client windsurf
 npx -y @destruction13/hermes-overlord-mcp config --client opencode
 npx -y @destruction13/hermes-overlord-mcp config --client codex
 npx -y @destruction13/hermes-overlord-mcp config --client antigravity
+```
+
+When you use the GitHub install path before npm publication, `npx` passes that
+package reference through to generated configs. The resulting client config uses
+`github:Destruction13/hermes-overlord-mcp` as the launch target instead of the
+future npm package name.
+
+VS Code-style clients that support `--add-mcp` can consume the flat payload from
+the `add-mcp` format:
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
+npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity --format add-mcp
+npx -y github:Destruction13/hermes-overlord-mcp config --client vscode --format add-mcp
+npx -y github:Destruction13/hermes-overlord-mcp config --client cursor --format add-mcp
 ```
 
 ## Runtime contract
@@ -78,6 +96,8 @@ contour:
 - Selected skills needed to understand, audit, and extend the package.
 - Config snippets for generic MCP, VS Code, Cursor, Kilo, Kiro, Windsurf,
   OpenCode, Codex, and Antigravity.
+- Flat `add-mcp` payloads for VS Code, Cursor, Kiro, and Antigravity CLI
+  installs.
 - Distribution docs and a machine-readable `MANIFEST.json` in generated builds.
 
 ## Excluded
