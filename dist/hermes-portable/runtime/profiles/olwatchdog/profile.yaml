@@ -1,0 +1,3 @@
+description: 'Overlord watchdog: monitors Kanban, heartbeats, stalled tasks, blocked
+  tasks, stale workers, and goal drift.'
+description_auto: false

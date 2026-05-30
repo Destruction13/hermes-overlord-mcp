@@ -1,0 +1,52 @@
+[
+  {
+    "id": "executive",
+    "name": "Executive",
+    "mode": "flow",
+    "appMode": "present",
+    "density": "comfortable",
+    "theme": "light",
+    "edgeColor": "brand",
+    "showLabels": false
+  },
+  {
+    "id": "engineer",
+    "name": "Engineer",
+    "mode": "flow",
+    "appMode": "view",
+    "density": "cozy",
+    "theme": "light",
+    "edgeColor": "neutral",
+    "showLabels": true
+  },
+  {
+    "id": "risk-audit",
+    "name": "Risk audit",
+    "mode": "mcp",
+    "appMode": "view",
+    "density": "compact",
+    "theme": "graphite",
+    "edgeColor": "severity",
+    "attentionOnly": true
+  },
+  {
+    "id": "mcp-map",
+    "name": "MCP map",
+    "mode": "mcp",
+    "appMode": "view",
+    "density": "cozy",
+    "theme": "light",
+    "mcpView": "map",
+    "edgeColor": "neutral"
+  },
+  {
+    "id": "onboarding",
+    "name": "Onboarding",
+    "mode": "flow",
+    "appMode": "view",
+    "density": "comfortable",
+    "theme": "sepia",
+    "edgeColor": "phase",
+    "selectedId": "overlord"
+  }
+]

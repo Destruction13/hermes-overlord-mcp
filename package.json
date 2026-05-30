@@ -1,0 +1,85 @@
+{
+  "name": "@destruction13/hermes-overlord-mcp",
+  "version": "1.0.0",
+  "description": "Client-neutral Hermes Overlord MCP server with npx install and config generators for MCP-compatible IDEs.",
+  "type": "module",
+  "bin": {
+    "hermes-overlord-mcp": "./bin/hermes-overlord-mcp.js"
+  },
+  "scripts": {
+    "test": "python -m unittest discover -s tests",
+    "doctor": "python hermesctl.py doctor",
+    "package:portable": "python hermesctl.py package",
+    "clean:audit": "python hermesctl.py clean-audit",
+    "mcp:stdio": "node ./bin/hermes-overlord-mcp.js",
+    "mcp:http": "node ./bin/hermes-overlord-mcp.js start-http",
+    "config:generic": "node ./bin/hermes-overlord-mcp.js config --client generic",
+    "init:generic": "node ./bin/hermes-overlord-mcp.js init --client generic"
+  },
+  "files": [
+    "bin/",
+    "bridge/",
+    "mcp/",
+    "dashboard/README.md",
+    "dashboard/index.html",
+    "dashboard/styles.css",
+    "dashboard/app.js",
+    "dashboard/data.js",
+    "dashboard/generate-dashboard-data.py",
+    "dashboard/serve-dashboard.py",
+    "dashboard/hermes-preset-defaults.json",
+    "docs/distribution/",
+    "docs/codebase/*.md",
+    "docs/HERMES_USER_GUIDE.md",
+    "docs/HERMES_MCP_HEALTH.md",
+    "docs/CODEX_HERMES_BRIDGE.md",
+    "docs/CODEX_HERMES_NATIVE_LIVE_TEST.md",
+    "dist/hermes-portable/runtime/",
+    "dist/hermes-portable/client-configs/",
+    "dist/hermes-portable/skills/",
+    "skills/acquire-codebase-knowledge/",
+    "skills/audit-integrity/",
+    "skills/mcp-builder/",
+    "tests/",
+    "hermesctl.py",
+    "hermesctl.ps1",
+    "hermesctl.sh",
+    "bridge.ps1",
+    "codex-hermes.ps1",
+    "overlord.ps1",
+    "overlord-dashboard.ps1",
+    "overlord-kanban-create.ps1",
+    "hermes-site.ps1",
+    "watch-hermes.ps1",
+    "ensure-obsidian.ps1",
+    "storybook-enable.ps1",
+    "telegram-connect.ps1",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "!**/__pycache__/**",
+    "!**/*.pyc",
+    "!docs/codebase/.codebase-scan.txt"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "hermes",
+    "overlord",
+    "agent",
+    "npx"
+  ],
+  "author": "Destruction13",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Destruction13/hermes-overlord-mcp.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

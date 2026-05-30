@@ -1,0 +1,6 @@
+{
+  "name": "hermes-overlord",
+  "displayName": "Hermes Overlord",
+  "description": "Portable Hermes Overlord MCP bridge for any MCP-compatible client.",
+  "version": "0.1.0"
+}

@@ -1,0 +1,22 @@
+{
+  "mcp": {
+    "hermes-overlord": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@destruction13/hermes-overlord-mcp"
+      ],
+      "environment": {
+        "HERMES_HOME": "${HERMES_HOME}",
+        "HERMES_OVERLORD_ROOT": "${HERMES_ROOT}",
+        "HERMES_BRIDGE_ROOT": "${HERMES_ROOT}",
+        "HERMES_BRIDGE_PROFILE": "overlord",
+        "HERMES_BRIDGE_BOARD": "overlord",
+        "HERMES_BRIDGE_WORKSPACE": "dir:${HERMES_WORKSPACE_ROOT}",
+        "HERMES_BRIDGE_CLIENT": "opencode"
+      },
+      "enabled": true
+    }
+  }
+}

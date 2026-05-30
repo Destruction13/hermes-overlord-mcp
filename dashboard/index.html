@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hermes Control Constellation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=dashboard-clickfix-20260526">
+</head>
+<body>
+  <main class="workspace-shell">
+    <header class="appbar">
+      <div class="brand-block">
+        <p id="breadcrumb" class="eyebrow mono">Hermes / Constellation</p>
+        <h1>Hermes Control Constellation</h1>
+      </div>
+      <div class="status-row" id="statusRow"></div>
+      <div class="top-mode" role="radiogroup" aria-label="Режим работы">
+        <button class="mode-btn active" type="button" data-app-mode="view" role="radio" aria-checked="true">Просмотр</button>
+        <button class="mode-btn" type="button" data-app-mode="constructor" role="radio" aria-checked="false">Конструктор</button>
+        <button class="mode-btn" type="button" data-app-mode="present" role="radio" aria-checked="false">Презентация</button>
+      </div>
+      <div class="app-actions" aria-label="Board controls">
+        <span id="updatedLabel" class="updated-label">Updated: сейчас</span>
+        <button id="fitBtn" class="icon-btn" type="button" title="Вписать карту" aria-label="Вписать карту">⤢</button>
+        <button id="zoomOutBtn" class="icon-btn" type="button" title="Отдалить" aria-label="Отдалить">-</button>
+        <button id="zoomInBtn" class="icon-btn" type="button" title="Приблизить" aria-label="Приблизить">+</button>
+        <button id="resetBtn" class="icon-btn" type="button" title="Сбросить вид" aria-label="Сбросить вид">⟲</button>
+        <button id="presentToggleBtn" class="icon-btn" type="button" title="Скрыть панели" aria-label="Скрыть панели">⛶</button>
+      </div>
+    </header>
+
+    <div id="constructorToolbar" class="constructor-toolbar" hidden>
+      <button id="undoBtn" class="tool-btn" type="button" title="Отменить">↶ Отмена</button>
+      <button id="redoBtn" class="tool-btn" type="button" title="Повторить">↷ Повтор</button>
+      <button id="autoLayoutBtn" class="tool-btn" type="button" title="Вернуть раскладку текущего вида">Авто-сетка</button>
+      <button id="lockBtn" class="tool-btn" type="button" aria-pressed="false" title="Запретить перетаскивание">Замок</button>
+      <button id="snapBtn" class="tool-btn active" type="button" aria-pressed="true" title="Привязка к сетке">Магнит</button>
+      <div class="density-switch" role="radiogroup" aria-label="Плотность">
+        <button class="density-btn" type="button" data-density="compact" role="radio" aria-checked="false">Плотно</button>
+        <button class="density-btn active" type="button" data-density="cozy" role="radio" aria-checked="true">Норм</button>
+        <button class="density-btn" type="button" data-density="comfortable" role="radio" aria-checked="false">Широко</button>
+      </div>
+      <button id="themeBtn" class="tool-btn" type="button">Палитра</button>
+      <button id="exportBtn" class="tool-btn" type="button">Экспорт</button>
+      <button id="importBtn" class="tool-btn" type="button">Импорт</button>
+      <button id="presetBtn" class="tool-btn" type="button">Пресет</button>
+      <input id="importInput" type="file" accept="application/json" hidden>
+    </div>
+
+    <section class="map-layout">
+      <aside class="left-panel" aria-label="Map navigation">
+        <div class="panel-section">
+          <h2>Режим</h2>
+          <div class="segmented" role="group" aria-label="Map mode">
+            <button class="seg-btn active" type="button" data-mode="flow" aria-pressed="true">Поток</button>
+            <button class="seg-btn" type="button" data-mode="projects" aria-pressed="false">Проекты</button>
+            <button class="seg-btn" type="button" data-mode="mcp" aria-pressed="false">MCP</button>
+          </div>
+        </div>
+
+        <div class="panel-section project-secondary">
+          <label class="field-label" for="searchInput">Поиск</label>
+          <div class="search-shell">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" class="search-input" type="search" role="searchbox" aria-label="Поиск по карте" autocomplete="off" placeholder="поиск по агентам, MCP, тегам">
+            <kbd>/</kbd>
+          </div>
+        </div>
+
+        <div class="panel-section project-secondary">
+          <h2>Слои</h2>
+          <div class="filter-pills">
+            <button id="labelsToggle" class="toggle-pill active" type="button" aria-pressed="true">Подписи</button>
+            <button id="attentionToggle" class="toggle-pill" type="button" aria-pressed="false">Проблемные <span id="attentionCount" class="mini-count"></span></button>
+            <button id="allMcpEdgesToggle" class="toggle-pill" type="button" aria-pressed="false">Все MCP</button>
+          </div>
+        </div>
+
+        <div class="panel-section grow">
+          <div class="section-headline">
+            <h2 id="navigatorTitle">Агенты</h2>
+            <span id="navigatorCount"></span>
+          </div>
+          <div id="navigatorList" class="navigator-list"></div>
+        </div>
+      </aside>
+
+      <section class="board-wrap" aria-label="Interactive infrastructure board">
+        <div class="board-topline">
+          <div>
+            <strong id="boardTitle">Поток задач</strong>
+            <span id="boardHint">Overlord -> Council -> Workers -> Review -> Synth</span>
+          </div>
+          <div id="mcpViewSwitch" class="mcp-view-switch" role="radiogroup" aria-label="Вид MCP" hidden>
+            <button class="mcp-view-btn active" type="button" data-mcp-view="map" role="radio" aria-checked="true">Карта связей</button>
+            <button class="mcp-view-btn" type="button" data-mcp-view="matrix" role="radio" aria-checked="false">Матрица</button>
+            <button class="mcp-view-btn" type="button" data-mcp-view="catalog" role="radio" aria-checked="false">Каталог</button>
+          </div>
+          <span id="zoomLabel" class="zoom-label">100%</span>
+        </div>
+        <div id="projectRail" class="project-rail" hidden></div>
+        <div id="boardViewport" class="board-viewport">
+          <div id="boardCanvas" class="board-canvas">
+            <svg id="edgeLayer" class="edge-layer" aria-hidden="true"></svg>
+            <div id="laneLayer" class="lane-layer" aria-hidden="true"></div>
+            <div id="nodeLayer" class="node-layer"></div>
+          </div>
+        </div>
+        <div id="mcpPanel" class="mcp-panel" hidden></div>
+        <div id="mobileList" class="mobile-list-view" aria-label="Список карты"></div>
+        <div class="minimap-wrap">
+          <canvas id="minimap" width="180" height="120" tabindex="0" role="button" aria-label="Миникарта"></canvas>
+        </div>
+        <div class="legend-wrap">
+          <button id="legendBtn" class="legend-toggle" type="button" aria-expanded="false" aria-controls="legendPanel">?</button>
+          <div id="legendPanel" class="legend-panel" hidden>
+            <strong>Легенда</strong>
+            <span><i class="dot director"></i>Director — оркестратор</span>
+            <span><i class="dot council"></i>Council — совет</span>
+            <span><i class="dot execution"></i>Execution — исполнители</span>
+            <span><i class="dot control"></i>Control — контроль</span>
+            <span><i class="dot output"></i>Output — финальный синтез</span>
+            <span><i class="dot storage"></i>Memory/Systems — память</span>
+            <span class="line-sample solid"></span><span>сплошная — активный data-flow</span>
+            <span class="line-sample dashed"></span><span>пунктир — отключенный MCP</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="Node inspector">
+        <div class="inspector-head">
+          <div>
+            <p id="inspectorKind" class="eyebrow">Агент</p>
+            <h2 id="inspectorTitle">overlord</h2>
+          </div>
+          <span id="inspectorPhase" class="pill director">Director</span>
+        </div>
+        <div class="inspector-tabs" role="tablist" aria-label="Inspector tabs">
+          <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="overview">Обзор</button>
+          <button class="tab-btn" type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="mcp">MCP</button>
+          <button class="tab-btn" type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="flow">Связи</button>
+          <button class="tab-btn constructor-only" type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="properties">Свойства</button>
+        </div>
+        <div id="inspectorBody" class="inspector-body"></div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="soulModal" class="modal-backdrop" hidden>
+    <section class="soul-modal" role="dialog" aria-modal="true" aria-labelledby="soulModalTitle" aria-describedby="soulModalContent">
+      <header class="soul-modal-head">
+        <div>
+          <p class="eyebrow">SOUL</p>
+          <h2 id="soulModalTitle">SOUL</h2>
+        </div>
+        <button id="closeSoulModal" class="icon-btn" type="button" aria-label="Закрыть SOUL">Закрыть</button>
+      </header>
+      <pre id="soulModalContent" class="soul-modal-content"></pre>
+    </section>
+  </div>
+
+  <aside id="themeDrawer" class="side-drawer" aria-label="Настройки темы" hidden>
+    <header class="drawer-head">
+      <div>
+        <p class="eyebrow mono">Constructor</p>
+        <h2>Тема и карта</h2>
+      </div>
+      <button id="closeThemeDrawer" class="icon-btn" type="button" aria-label="Закрыть настройки">×</button>
+    </header>
+    <div id="themeDrawerBody" class="drawer-body"></div>
+  </aside>
+
+  <aside id="mcpDrawer" class="side-drawer wide" aria-label="MCP details" hidden>
+    <header class="drawer-head">
+      <div>
+        <p class="eyebrow mono">MCP</p>
+        <h2 id="mcpDrawerTitle">MCP</h2>
+      </div>
+      <button id="closeMcpDrawer" class="icon-btn" type="button" aria-label="Закрыть MCP">×</button>
+    </header>
+    <div id="mcpDrawerBody" class="drawer-body"></div>
+  </aside>
+
+  <div id="edgePopover" class="edge-popover" hidden></div>
+
+  <script src="data.js"></script>
+  <script src="app.js?v=dashboard-clickfix-20260526"></script>
+</body>
+</html>

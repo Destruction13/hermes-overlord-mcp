@@ -1,0 +1,16 @@
+{
+  "approvals": [
+    {
+      "approved_at": "2026-05-24T21:35:05.304102Z",
+      "command": "C:/Users/\u0414\u0430\u043d\u044f/AppData/Local/hermes/hermes-agent/venv/Scripts/python.exe C:/Users/\u0414\u0430\u043d\u044f/AppData/Local/hermes/hooks/block_direct_codex_exec.py",
+      "event": "pre_tool_call",
+      "script_mtime_at_approval": "2026-05-21T15:31:27.768897Z"
+    },
+    {
+      "approved_at": "2026-05-24T21:35:05.321239Z",
+      "command": "C:/Users/\u0414\u0430\u043d\u044f/AppData/Local/hermes/hermes-agent/venv/Scripts/python.exe C:/Users/\u0414\u0430\u043d\u044f/AppData/Local/hermes/hooks/log_nerood_subagent_stop.py",
+      "event": "subagent_stop",
+      "script_mtime_at_approval": "2026-05-21T16:01:37.945216Z"
+    }
+  ]
+}

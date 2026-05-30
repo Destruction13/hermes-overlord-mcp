@@ -1,0 +1,63 @@
+# Secrets and local identity
+.env
+**/.env
+auth.json
+google_token.json
+google_client_secret.json
+*token*
+*secret*
+*.pem
+*.key
+mcp-tokens/
+
+# Runtime state and history
+logs/
+sessions/
+memories/
+kanban.db*
+state.db*
+cleanup-manifest.json
+docs/codebase/.codebase-scan.txt
+Hermes-quarantine-*/
+
+# Local dependency and generated caches
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+.tools/
+.wrangler/
+.oauth-refresh/
+.playwright-mcp/
+
+# Temporary work and generated media
+scratch/
+downloads/
+NUL
+*.tmp
+*.temp
+*.log
+*.tgz
+*.zip
+*.7z
+*.bak*
+*.backup*
+dashboard/*.png
+dashboard/*.jpg
+dashboard/*.jpeg
+dashboard/*.webp
+
+# Generated portable package internals. Keep only runtime templates/configs.
+dist/hermes-portable/source/
+dist/hermes-portable/docs/
+dist/hermes-portable/MANIFEST.json
+
+# The local skill mirror is large; publish only Hermes-selected skills.
+skills/*
+!skills/acquire-codebase-knowledge/
+!skills/acquire-codebase-knowledge/**
+!skills/audit-integrity/
+!skills/audit-integrity/**
+!skills/mcp-builder/
+!skills/mcp-builder/**

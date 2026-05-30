@@ -1,0 +1,3 @@
+description: 'Overlord synthesizer: reads worker reports, resolves conflicts, writes
+  final user-facing summaries and Obsidian/Markdown records.'
+description_auto: false
