@@ -59,15 +59,14 @@ Client-specific presets below only adapt where each app stores this same server.
 }
 ```
 
-## Client presets
+## Клиентские предустановки
 
-Open the block for your IDE or agent client. The MCP server is universal; the
-small wrapper changes only the config shape that each client expects.
+Откройте блок для своей интегрированной среды разработки или клиентского
+агента. Сервер MCP универсален, небольшая оболочка меняет только конфигурацию,
+которую ожидает каждый клиент.
 
-<details open>
+<details>
 <summary><strong>Claude Code</strong></summary>
-
-Use the Claude Code MCP CLI to add Hermes to the current project scope.
 
 ```bash
 claude mcp add hermes-overlord --scope local -e HERMES_BRIDGE_CLIENT=claude-code -- npx -y github:Destruction13/hermes-overlord-mcp
@@ -78,8 +77,6 @@ claude mcp add hermes-overlord --scope local -e HERMES_BRIDGE_CLIENT=claude-code
 <details>
 <summary><strong>Codex</strong></summary>
 
-Use the Codex MCP CLI to write the server entry into `~/.codex/config.toml`.
-
 ```bash
 codex mcp add hermes-overlord --env HERMES_BRIDGE_CLIENT=codex -- npx -y github:Destruction13/hermes-overlord-mcp
 ```
@@ -89,33 +86,23 @@ codex mcp add hermes-overlord --env HERMES_BRIDGE_CLIENT=codex -- npx -y github:
 <details>
 <summary><strong>VS Code / GitHub Copilot</strong></summary>
 
-Generate a VS Code-compatible MCP server payload.
-
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client vscode --format add-mcp
 ```
 
-Use `config --client vscode` when you want the full `.vscode/mcp.json` shape.
-
 </details>
 
 <details>
-<summary><strong>Cursor</strong></summary>
-
-Generate the Cursor add-MCP payload.
+<summary><strong>Курсор</strong></summary>
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client cursor --format add-mcp
 ```
 
-Use `config --client cursor` when you want the full Cursor MCP JSON shape.
-
 </details>
 
 <details>
-<summary><strong>Windsurf</strong></summary>
-
-Generate a Windsurf Cascade MCP snippet.
+<summary><strong>Виндсерфинг</strong></summary>
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
@@ -126,8 +113,6 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
 <details>
 <summary><strong>OpenCode</strong></summary>
 
-Generate the `opencode.json` MCP block.
-
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
 ```
@@ -136,8 +121,6 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
 
 <details>
 <summary><strong>Gemini CLI</strong></summary>
-
-Generate a `~/.gemini/settings.json` compatible MCP block.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
@@ -148,8 +131,6 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
 <details>
 <summary><strong>Kilo Code</strong></summary>
 
-Generate the Kilo Code MCP settings block.
-
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
 ```
@@ -159,35 +140,23 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
 <details>
 <summary><strong>Kiro</strong></summary>
 
-Generate the Kiro add-MCP payload.
-
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
 ```
 
-Use `config --client kiro` when you want the full `.kiro/settings/mcp.json`
-shape.
-
 </details>
 
 <details>
-<summary><strong>Antigravity</strong></summary>
-
-Generate the Antigravity add-MCP payload.
+<summary><strong>Антигравитация</strong></summary>
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity --format add-mcp
 ```
 
-Use `config --client antigravity` when you want the full
-`~/.gemini/antigravity/mcp_config.json` shape or plugin `mcp_config.json`.
-
 </details>
 
 <details>
 <summary><strong>Cline</strong></summary>
-
-Generate the Cline MCP settings block.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client cline
@@ -198,8 +167,6 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client cline
 <details>
 <summary><strong>Roo Code</strong></summary>
 
-Generate the Roo Code MCP settings block.
-
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
 ```
@@ -207,9 +174,7 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
 </details>
 
 <details>
-<summary><strong>Continue</strong></summary>
-
-Generate the Continue MCP settings block.
+<summary><strong>Продолжить</strong></summary>
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client continue
@@ -219,8 +184,6 @@ npx -y github:Destruction13/hermes-overlord-mcp config --client continue
 
 <details>
 <summary><strong>Zed</strong></summary>
-
-Generate the Zed `context_servers` block.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client zed
