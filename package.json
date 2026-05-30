@@ -30,6 +30,7 @@
     "dashboard/serve-dashboard.py",
     "dashboard/hermes-preset-defaults.json",
     "docs/distribution/",
+    "docs/assets/",
     "docs/codebase/*.md",
     "docs/HERMES_USER_GUIDE.md",
     "docs/HERMES_MCP_HEALTH.md",

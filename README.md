@@ -1,14 +1,30 @@
 # Hermes Overlord MCP
 
-Hermes Overlord MCP is a client-neutral MCP server for the Hermes Overlord
-agent contour. It exposes one portable MCP surface that any MCP-compatible IDE
-or agent client can launch with `npx`, then use through standard MCP tools.
+<p align="center">
+  <img src="docs/assets/hermes-overlord-hero.png" alt="Hermes Overlord command throne with red terminal panels" width="100%" />
+</p>
 
-The server id is `hermes-overlord`. The display name is `Hermes Overlord`.
+<p align="center">
+  <a href="https://github.com/Destruction13/hermes-overlord-mcp"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-public-111827?style=for-the-badge&logo=github&logoColor=white"></a>
+  <img alt="MCP compatible" src="https://img.shields.io/badge/MCP-compatible-b91c1c?style=for-the-badge">
+  <img alt="Install with npx" src="https://img.shields.io/badge/install-npx-18181b?style=for-the-badge&logo=npm&logoColor=white">
+  <img alt="Twelve tools" src="https://img.shields.io/badge/tools-12-7f1d1d?style=for-the-badge">
+  <img alt="Transport" src="https://img.shields.io/badge/stdio%20%7C%20http-0f172a?style=for-the-badge">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/Destruction13/hermes-overlord-mcp?style=for-the-badge"></a>
+</p>
 
-## Quick start
+Hermes Overlord MCP is a portable Model Context Protocol gateway for the Hermes
+agent contour. It gives any MCP-compatible IDE or agent client one clean server,
+one install path, and the same Overlord tool surface for task submission,
+status, reports, dispatch, health checks, and direct asks.
 
-Install or run Hermes from the public GitHub package with `npx`:
+The server appears as `hermes-overlord` / `Hermes Overlord` in MCP clients.
+
+## Install
+
+Use the public GitHub package today. The `install` command prints the polished
+client selector with the standard config, requirements, and per-client setup
+blocks.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp install
@@ -16,12 +32,7 @@ npx -y github:Destruction13/hermes-overlord-mcp init --client generic
 npx -y github:Destruction13/hermes-overlord-mcp doctor
 ```
 
-The `install` command prints a screenshot-style guide: standard JSON for most
-MCP clients, requirements, and client-specific snippets for Claude Code, Codex,
-VS Code, Cursor, Windsurf, OpenCode, Gemini CLI, Kilo, Kiro, Antigravity,
-Cline, Roo Code, Continue, and Zed.
-
-After the package is published to npm, use the package name directly:
+After npm publication, the same commands work with the npm package name.
 
 ```bash
 npx -y @destruction13/hermes-overlord-mcp install
@@ -29,8 +40,10 @@ npx -y @destruction13/hermes-overlord-mcp init --client generic
 npx -y @destruction13/hermes-overlord-mcp doctor
 ```
 
-For any MCP client that supports local `stdio` servers, the core launch command
-is:
+## Standard config
+
+Use this block for any MCP client that accepts a normal `mcpServers` object.
+Client-specific presets below only adapt where each app stores this same server.
 
 ```json
 {
@@ -46,66 +59,242 @@ is:
 }
 ```
 
-Use `config` to generate client-specific snippets:
+## Client presets
+
+Open the block for your IDE or agent client. The MCP server is universal; the
+small wrapper changes only the config shape that each client expects.
+
+<details open>
+<summary><strong>Claude Code</strong></summary>
+
+Use the Claude Code MCP CLI to add Hermes to the current project scope.
 
 ```bash
-npx -y github:Destruction13/hermes-overlord-mcp config --client generic
-npx -y github:Destruction13/hermes-overlord-mcp config --client claude-code
-npx -y github:Destruction13/hermes-overlord-mcp config --client codex
-npx -y github:Destruction13/hermes-overlord-mcp config --client vscode
-npx -y github:Destruction13/hermes-overlord-mcp config --client cursor
+claude mcp add hermes-overlord --scope local -e HERMES_BRIDGE_CLIENT=claude-code -- npx -y github:Destruction13/hermes-overlord-mcp
+```
+
+</details>
+
+<details>
+<summary><strong>Codex</strong></summary>
+
+Use the Codex MCP CLI to write the server entry into `~/.codex/config.toml`.
+
+```bash
+codex mcp add hermes-overlord --env HERMES_BRIDGE_CLIENT=codex -- npx -y github:Destruction13/hermes-overlord-mcp
+```
+
+</details>
+
+<details>
+<summary><strong>VS Code / GitHub Copilot</strong></summary>
+
+Generate a VS Code-compatible MCP server payload.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client vscode --format add-mcp
+```
+
+Use `config --client vscode` when you want the full `.vscode/mcp.json` shape.
+
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+Generate the Cursor add-MCP payload.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client cursor --format add-mcp
+```
+
+Use `config --client cursor` when you want the full Cursor MCP JSON shape.
+
+</details>
+
+<details>
+<summary><strong>Windsurf</strong></summary>
+
+Generate a Windsurf Cascade MCP snippet.
+
+```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client windsurf
-npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
-npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
-npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
-npx -y github:Destruction13/hermes-overlord-mcp config --client kiro
-npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity
-npx -y github:Destruction13/hermes-overlord-mcp config --client cline
-npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
-npx -y github:Destruction13/hermes-overlord-mcp config --client continue
-npx -y github:Destruction13/hermes-overlord-mcp config --client zed
 ```
 
-For Claude Code and Codex, `install --client` prints the direct CLI command:
+</details>
+
+<details>
+<summary><strong>OpenCode</strong></summary>
+
+Generate the `opencode.json` MCP block.
 
 ```bash
-npx -y github:Destruction13/hermes-overlord-mcp install --client claude-code
-npx -y github:Destruction13/hermes-overlord-mcp install --client codex
+npx -y github:Destruction13/hermes-overlord-mcp config --client opencode
 ```
 
-VS Code-style clients that expose `--add-mcp`, including VS Code, Cursor, Kiro,
-and Antigravity, can use the flat install payload:
+</details>
+
+<details>
+<summary><strong>Gemini CLI</strong></summary>
+
+Generate a `~/.gemini/settings.json` compatible MCP block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client gemini-cli
+```
+
+</details>
+
+<details>
+<summary><strong>Kilo Code</strong></summary>
+
+Generate the Kilo Code MCP settings block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client kilo
+```
+
+</details>
+
+<details>
+<summary><strong>Kiro</strong></summary>
+
+Generate the Kiro add-MCP payload.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp config --client kiro --format add-mcp
 ```
 
-## What the MCP exposes
+Use `config --client kiro` when you want the full `.kiro/settings/mcp.json`
+shape.
 
-Hermes Overlord MCP lists these tools:
+</details>
 
-- `hermes_submit_task`
-- `hermes_task_report`
-- `hermes_task_status`
-- `hermes_task_events`
-- `hermes_heartbeat_prompt`
-- `hermes_task_list`
-- `hermes_task_comment`
-- `hermes_task_log`
-- `hermes_dispatch_once`
-- `hermes_gateway_status`
-- `hermes_autocheck`
-- `hermes_direct_ask`
+<details>
+<summary><strong>Antigravity</strong></summary>
 
-The client submits one durable root task. Hermes owns routing, specialist
-profiles, skills, MCP/tool usage, review, watchdog, and synthesis.
+Generate the Antigravity add-MCP payload.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client antigravity --format add-mcp
+```
+
+Use `config --client antigravity` when you want the full
+`~/.gemini/antigravity/mcp_config.json` shape or plugin `mcp_config.json`.
+
+</details>
+
+<details>
+<summary><strong>Cline</strong></summary>
+
+Generate the Cline MCP settings block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client cline
+```
+
+</details>
+
+<details>
+<summary><strong>Roo Code</strong></summary>
+
+Generate the Roo Code MCP settings block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client roo-code
+```
+
+</details>
+
+<details>
+<summary><strong>Continue</strong></summary>
+
+Generate the Continue MCP settings block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client continue
+```
+
+</details>
+
+<details>
+<summary><strong>Zed</strong></summary>
+
+Generate the Zed `context_servers` block.
+
+```bash
+npx -y github:Destruction13/hermes-overlord-mcp config --client zed
+```
+
+</details>
+
+## Tool surface
+
+Hermes exposes 12 MCP tools. Submit one durable root task, then read status,
+reports, or events while Hermes handles routing, profiles, skills, review, and
+synthesis.
+
+| Tool | Purpose |
+| --- | --- |
+| `hermes_submit_task` | Submit a durable root task to Hermes Overlord. |
+| `hermes_task_report` | Read a curator-friendly report for a task family. |
+| `hermes_task_status` | Read the current status of one task. |
+| `hermes_task_events` | Read structured task and bridge events. |
+| `hermes_heartbeat_prompt` | Generate a follow-up prompt for clients that support reminders. |
+| `hermes_task_list` | List Kanban tasks on a Hermes board. |
+| `hermes_task_comment` | Add a curator comment to a task. |
+| `hermes_task_log` | Read the tail of a worker log. |
+| `hermes_dispatch_once` | Run one dispatcher pass. |
+| `hermes_gateway_status` | Check Hermes gateway process status. |
+| `hermes_autocheck` | Run a quiet bridge, gateway, and Kanban health check. |
+| `hermes_direct_ask` | Ask Hermes a short explicit synchronous question. |
+
+## What ships
+
+The public package is a clean template, not a copy of local history. It includes
+the pieces needed to recreate the Hermes Overlord MCP contour.
+
+- Runtime templates:
+  - sanitized `overlord` and `ol*` profile souls;
+  - profile config templates;
+  - `ENV_KEYS.txt` files with variable names only.
+- MCP distribution:
+  - Node `npx` launcher;
+  - Python bridge and CLI wrappers;
+  - generated client configs;
+  - `stdio` and localhost Streamable HTTP support.
+- Operator material:
+  - dashboard source;
+  - selected skills;
+  - distribution docs and manifests.
+
+It intentionally excludes local secrets, `.env` files, OAuth caches, Kanban
+history, logs, sessions, screenshots, scratch workspaces, `node_modules`, and
+Python bytecode.
+
+## Runtime environment
+
+Credentials stay user-supplied through environment variables, shell profiles,
+IDE secret stores, or MCP client config. The package never bundles tokens.
+
+| Variable | Default | Use |
+| --- | --- | --- |
+| `HERMES_HOME` | `%LOCALAPPDATA%\hermes` on Windows, `~/.hermes` on macOS/Linux | User-local Hermes runtime home. |
+| `HERMES_PYTHON` | auto-detected | Optional Python interpreter override. |
+| `HERMES_BRIDGE_COMMAND` | package bridge | Optional full bridge command override. |
+| `HERMES_BRIDGE_BOARD` | `overlord` | Hermes Kanban board. |
+| `HERMES_BRIDGE_PROFILE` | `overlord` | Default Hermes profile. |
+| `HERMES_BRIDGE_WORKSPACE` | user home | Default workspace for submitted tasks. |
 
 ## Commands
 
+Use the package commands directly during development or through `npx` after
+installation.
+
 ```bash
 hermes-overlord-mcp                 # start MCP over stdio
-hermes-overlord-mcp init            # create HERMES_HOME templates and config
 hermes-overlord-mcp install         # print install guide/client snippets
+hermes-overlord-mcp init            # create HERMES_HOME templates and config
 hermes-overlord-mcp config          # print MCP config JSON
 hermes-overlord-mcp doctor          # check local readiness
 hermes-overlord-mcp start-http      # start Streamable HTTP on localhost
@@ -113,34 +302,16 @@ hermes-overlord-mcp package         # build dist/hermes-portable
 hermes-overlord-mcp clean-audit     # audit non-shareable local files
 ```
 
-`stdio` is the default for local IDEs. Streamable HTTP is available for local or
-remote gateways:
+Streamable HTTP is available for local or remote gateways. Keep it on localhost
+unless you add explicit authentication and network controls.
 
 ```bash
 npx -y github:Destruction13/hermes-overlord-mcp start-http --host 127.0.0.1 --port 8765
 ```
 
-Remote HTTP exposure must add explicit authentication and network controls.
-
-## Runtime environment
-
-The package never bundles credentials. Configure secrets through environment
-variables, shell profiles, IDE secret storage, or your MCP client environment.
-
-Common environment variables:
-
-- `HERMES_HOME`: Hermes runtime home. Defaults to `%LOCALAPPDATA%\hermes` on
-  Windows and `~/.hermes` on macOS/Linux.
-- `HERMES_PYTHON`: Optional explicit Python interpreter.
-- `HERMES_BRIDGE_COMMAND`: Optional full command override for unusual runtime
-  installs.
-- `HERMES_BRIDGE_BOARD`: Defaults to `overlord`.
-- `HERMES_BRIDGE_PROFILE`: Defaults to `overlord`.
-- `HERMES_BRIDGE_WORKSPACE`: Default workspace for submitted tasks.
-
 ## Development
 
-Build and check the portable template:
+Run these checks before publishing changes.
 
 ```bash
 python hermesctl.py package
@@ -149,10 +320,6 @@ python -m unittest discover -s tests
 npm pack --dry-run
 ```
 
-The portable template intentionally excludes secrets, token caches, Kanban
-history, logs, sessions, screenshots, scratch workspaces, `node_modules`, and
-Python bytecode. See `docs/distribution/README.md` for the distribution guide.
-
-Codex-specific `/hermes` guardrails remain separate from the universal MCP
+Codex-specific `/hermes` guardrails live separately from the universal MCP
 package. The MCP server itself is not tied to Codex, Antigravity, or any single
 IDE.
